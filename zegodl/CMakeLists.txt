@@ -1,0 +1,8 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+project(zegowrapper)
+SET(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
+AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/src/ zegowrapper_src)
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/include")
+ADD_LIBRARY(zegowrapper SHARED ${zegowrapper_src})
+
+install(TARGETS zegowrapper DESTINATION ${PROJECT_SOURCE_DIR}/bin)

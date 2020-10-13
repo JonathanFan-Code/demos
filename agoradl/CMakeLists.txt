@@ -1,0 +1,9 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+project(agorawrapper)
+
+SET(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
+AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/src/ agorawrapper_src)
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/include")
+ADD_LIBRARY(agorawrapper SHARED ${agorawrapper_src})
+
+install(TARGETS agorawrapper DESTINATION ${PROJECT_SOURCE_DIR}/bin)
