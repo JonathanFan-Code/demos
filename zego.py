@@ -4,20 +4,26 @@ import tkinter
 import json
 import sys
 import random
+import time
+
 
 channelName = "fantest"
 profile = {"bitrate": "600", "fps": "15", "resolution": "640*320"}
 
 isRobot = False
+disableVideo = False
+
+#disableAudio does not work for zego
+disableAudio = False
 
 enableCustomCapture = False
 customVideoSrc = "C:\\Users\\FJS\\Videos\\wudao.mp4"
 
-if isRobot == True:
-    enableCustomCapture = True
-
 enableHwenc = False
 enableHwdec = False
+
+if isRobot == True:
+    enableCustomCapture = True
 
 try:
     current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -61,7 +67,8 @@ try:
     vprofile = json.dumps(profile)
     zego.setVideoProfile(ctypes.c_char_p(bytes(vprofile, 'utf-8')))
 
-    zego.enableVideo(ctypes.c_char_p(bytes("", 'utf-8')))
+    if disableVideo == False:
+        zego.enableVideo(ctypes.c_char_p(bytes("", 'utf-8')))
 
     if enableHwenc == True:
         zego.enableHardwareEncoder()
@@ -71,6 +78,13 @@ try:
     uid = "fan"+str(random.randint(0,1000))
     channel = json.dumps({"channelId":channelName,"uid":uid})
     zego.joinChannel(ctypes.c_char_p(bytes(channel, 'utf-8')))
+
+    if disableVideo == True:
+        zego.disableVideo()
+
+    #if disableAudio == True:
+     #   zego.disableAudio()
+
 
     if enableCustomCapture == True:
         zego.startCapMedia(ctypes.c_char_p(bytes(customVideoSrc, 'utf-8')))

@@ -124,6 +124,18 @@ extern "C" void ZEGODL_API enableVideo(LPVOID lpExtInfo)
 	cout << strOutput << endl;
 }
 
+extern "C" void ZEGODL_API disableVideo()
+{
+	cout << "disableVideo" << endl;
+	CZegoObject::GetZegoObject()->disableVideo();
+}
+
+extern "C" void ZEGODL_API disableAudio()
+{
+	cout << "disableAudio" << endl;
+	CZegoObject::GetZegoObject()->disableAudio();
+}
+
 extern "C" void ZEGODL_API setVideoProfile(LPVOID lpExtInfo)
 {
 	string strOutput;

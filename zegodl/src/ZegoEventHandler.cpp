@@ -104,14 +104,14 @@ void CustomVideoCapturer::collectVideoFrameAndSendToEngine()
         this->getVideoFrame(videoFrame);
         if (videoFrame)
         {
-            ZegoExpressSDK::getEngine()->sendCustomVideoCaptureRawData(videoFrame->data.get(), videoFrame->dataLength, videoFrame->param, videoFrame->referenceTimeMillsecond);
+            CZegoObject::GetZegoObject()->getEngine()->sendCustomVideoCaptureRawData(videoFrame->data.get(), videoFrame->dataLength, videoFrame->param, videoFrame->referenceTimeMillsecond);
         }
 
 		std::shared_ptr<ZegoCustomAudioFrame> audioFrame;
         this->getAudioFrame(audioFrame);
         if (audioFrame)
         {
-            ZegoExpressSDK::getEngine()->sendCustomAudioCapturePCMData(audioFrame->data.get(), audioFrame->dataLength, 
+            CZegoObject::GetZegoObject()->getEngine()->sendCustomAudioCapturePCMData(audioFrame->data.get(), audioFrame->dataLength, 
 			audioFrame->param);
         }
 

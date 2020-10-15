@@ -37,8 +37,8 @@ public:
 	virtual int destroy(LPVOID lpExtInfo, string &strOutput);
 	virtual int enableEncoder(LPVOID lpExtInfo, string &strOutput);
 	virtual int enableDecoder(LPVOID lpExtInfo, string &strOutput);
-	virtual int disableAudio(LPVOID lpExtInfo, string &strOutput);
-	virtual int disableVideo(LPVOID lpExtInfo, string &strOutput);
+	virtual int disableAudio();
+	virtual int disableVideo();
 	virtual int videoDrawing(LPVOID lpExtInfo, string &strOutput);
 
 	virtual int stopPlayingStream();
@@ -61,6 +61,7 @@ public:
 	void startCapMedia(string path);
 
 	void enableCustomAudioIO();
+	void updateStatus();
 
 	IZegoExpressEngine* getEngine();
 protected:
@@ -79,5 +80,7 @@ private:
 	std::string  m_localUserID;
 	std::vector<ZegoStream> m_zegoStreamList;
 	bool m_bstopPlayingStream = false;
+	bool m_bDisableVideo = false;
+	bool m_bDisableAudio = false;
 };
 

@@ -258,6 +258,9 @@ int CZegoObject::setVideoConfig(LPVOID lpExtInfo, string &strOutput)
 int CZegoObject::logoutRoom()
 {
 	m_bstopPlayingStream = false;
+	m_bDisableVideo = false;
+	m_bDisableAudio = false;
+
 	m_lpZegoEngine->logoutRoom(m_roomId);
 	getEngine()->enableCustomVideoCapture(false, nullptr);
     getEngine()->setCustomVideoCaptureHandler(nullptr);
@@ -290,24 +293,7 @@ void CZegoObject::onRoomStreamUpdate(const std::string &roomID, ZegoUpdateType u
 		}
 	}
 
-	if(m_bstopPlayingStream == true)
-		return;
-
-	CAGExtInfoManager *lpExtInfoManager = CAGExtInfoManager::GetAGExtInfoManager();
-
-	HWND hWnd = NULL;
-	int nViewPos = 1;//0 for local view
-	for( int j = 0; j < m_zegoStreamList.size(); j++) {
-		auto stream = m_zegoStreamList.at(j);
-
-		HWND hWnd = (HWND)lpExtInfoManager->GetViewAt(nViewPos);
-		if (hWnd != NULL)
-		{
-			ZegoCanvas canvas(hWnd, ZEGO_VIEW_MODE_ASPECT_FIT);
-			m_lpZegoEngine->startPlayingStream(stream.streamID, &canvas);
-			nViewPos++;
-		}
-	}
+	updateStatus();
 }
 
 int CZegoObject::stopPlayingStream()
@@ -316,27 +302,6 @@ int CZegoObject::stopPlayingStream()
 	for( auto stream:m_zegoStreamList) {
 		m_lpZegoEngine->stopPlayingStream(stream.streamID);
 	}
-	return 0;
-}
-
-int CZegoObject::disableAudio(LPVOID lpExtInfo, string &strOutput)
-{
-	string rawJson((char*)lpExtInfo);
-	Json::CharReaderBuilder builder;
-	JSONCPP_STRING err;
-	Json::Value root;
-
-	const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
-	if (!reader->parse(rawJson.c_str(), rawJson.c_str() + rawJson.length(), &root,
-		&err)) {
-		strOutput = "error";
-		return EXIT_FAILURE;
-	}
-
-	bool bMute = root["muted"].asBool();
-
-	m_lpZegoEngine->enableAudioCaptureDevice(!bMute);
-	m_lpZegoEngine->mutePublishStreamAudio(bMute);
 	return 0;
 }
 
@@ -365,25 +330,70 @@ void CZegoObject::startCapMedia(string path)
     theMediaSource->startPlayMedia(path);
 }
 
-int CZegoObject::disableVideo(LPVOID lpExtInfo, string &strOutput)
+int CZegoObject::disableAudio()
 {
-	string rawJson((char*)lpExtInfo);
-	Json::CharReaderBuilder builder;
-	JSONCPP_STRING err;
-	Json::Value root;
+	m_bDisableAudio = true;
 
-	const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
-	if (!reader->parse(rawJson.c_str(), rawJson.c_str() + rawJson.length(), &root,
-		&err)) {
-		strOutput = "error";
-		return EXIT_FAILURE;
+	m_lpZegoEngine->enableAudioCaptureDevice(!m_bDisableAudio);
+	m_lpZegoEngine->mutePublishStreamAudio(m_bDisableAudio);
+
+	for (auto stream : m_zegoStreamList) {
+		m_lpZegoEngine->mutePlayStreamAudio(stream.streamID, m_bDisableAudio);
 	}
 
-	bool bMute = root["muted"].asBool();
-
-	m_lpZegoEngine->mutePublishStreamVideo(bMute);
-	m_lpZegoEngine->enableCamera(!bMute);
+	/*
+	ZegoCustomAudioConfig audioConfig;
+	audioConfig.sourceType = ZEGO_AUDIO_SOURCE_TYPE_CUSTOM;
+	getEngine()->enableCustomAudioIO(true, &audioConfig);
+	*/
 	return 0;
+}
+
+int CZegoObject::disableVideo()
+{
+	m_bDisableVideo = true;
+
+	m_lpZegoEngine->mutePublishStreamVideo(m_bDisableVideo);
+	for (auto stream : m_zegoStreamList) {
+		m_lpZegoEngine->mutePlayStreamVideo(stream.streamID, m_bDisableVideo);
+	}
+	m_lpZegoEngine->enableCamera(!m_bDisableVideo);
+	return 0;
+}
+
+void CZegoObject::updateStatus()
+{
+	if (m_bstopPlayingStream == true)
+		return;
+
+	CAGExtInfoManager *lpExtInfoManager = CAGExtInfoManager::GetAGExtInfoManager();
+
+	HWND hWnd = NULL;
+	int nViewPos = 1;//0 for local view
+	for (int j = 0; j < m_zegoStreamList.size(); j++) {
+		auto stream = m_zegoStreamList.at(j);
+
+		HWND hWnd = (HWND)lpExtInfoManager->GetViewAt(nViewPos);
+		if (hWnd != NULL)
+		{
+			ZegoCanvas canvas(hWnd, ZEGO_VIEW_MODE_ASPECT_FIT);
+			m_lpZegoEngine->startPlayingStream(stream.streamID, &canvas);
+			nViewPos++;
+		}
+	}
+
+	if (m_bDisableVideo == true)
+	{
+		for (auto stream : m_zegoStreamList) {
+			m_lpZegoEngine->mutePlayStreamVideo(stream.streamID, m_bDisableVideo);
+		}
+	}
+	if (m_bDisableAudio == true)
+	{
+		for (auto stream : m_zegoStreamList) {
+			m_lpZegoEngine->mutePlayStreamAudio(stream.streamID, m_bDisableAudio);
+		}
+	}
 }
 
 int CZegoObject::videoDrawing(LPVOID lpExtInfo, string &strOutput)
