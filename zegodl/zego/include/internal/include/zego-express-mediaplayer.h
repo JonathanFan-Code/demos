@@ -74,39 +74,19 @@ ZEGOEXP_API zego_seq EXP_CALL zego_express_media_player_seek_to(unsigned long lo
 
 
 /**
- * Set mediaplayer volume. Both the local play volume and the publish volume are set
+ * Set player volume
  *
- * @param volume The range is 0 ~ 200. The default is 60.
+ * @param volume The range is 0 ~ 100. The default is 50.
  */
 ZEGOEXP_API zego_error EXP_CALL zego_express_media_player_set_volume(int volume, enum zego_media_player_instance_index instance_index);
 
 
 /**
- * Set mediaplayer local playback volume
+ * Get the current volume
  *
- * @param volume The range is 0 ~ 200. The default is 60.
+ * The range is 0 ~ 100. The default is 50
  */
-ZEGOEXP_API zego_error EXP_CALL zego_express_media_player_set_play_volume(int volume, enum zego_media_player_instance_index instance_index);
-
-
-/**
- * Set mediaplayer publish volume
- *
- * @param volume The range is 0 ~ 200. The default is 60.
- */
-ZEGOEXP_API zego_error EXP_CALL zego_express_media_player_set_publish_volume(int volume, enum zego_media_player_instance_index instance_index);
-
-
-/**
- * Gets the current local playback volume of the mediaplayer, the range is 0 ~ 200, with the default value of 60
- */
-ZEGOEXP_API int EXP_CALL zego_express_media_player_get_play_volume(enum zego_media_player_instance_index instance_index);
-
-
-/**
- * Gets the current publish volume of the mediaplayer, the range is 0 ~ 200, with the default value of 60
- */
-ZEGOEXP_API int EXP_CALL zego_express_media_player_get_publish_volume(enum zego_media_player_instance_index instance_index);
+ZEGOEXP_API int EXP_CALL zego_express_media_player_get_volume(enum zego_media_player_instance_index instance_index);
 
 
 /**
@@ -125,14 +105,6 @@ ZEGOEXP_API unsigned long long EXP_CALL zego_express_media_player_get_total_dura
  * You should load resource before invoking this API, otherwise the return value is 0
  */
 ZEGOEXP_API unsigned long long EXP_CALL zego_express_media_player_get_current_progress(enum zego_media_player_instance_index instance_index);
-
-
-/**
- * Get the current volume
- *
- * @deprecated This interface is deprecated, please use `getPlayVolume` and `getPublishVolume` to get the corresponding local playback volume and publish volume.
- */
-ZEGOEXP_API int EXP_CALL zego_express_media_player_get_volume(enum zego_media_player_instance_index instance_index);
 
 
 /**
@@ -200,7 +172,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_media_player_enable_video_data(bool
  * The callback triggered when the state of the media player changes.
  *
  * @param state Media player status
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param instance_index Media player instance index
  * @param user_context Context of user.
  */
@@ -264,7 +236,7 @@ ZEGOEXP_API void EXP_CALL zego_register_media_player_audio_frame_callback(zego_o
 /**
  * Callback for media player loads resources
  *
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param instance_index Media player instance index
  * @param user_context Context of user.
  */
@@ -277,7 +249,7 @@ ZEGOEXP_API void EXP_CALL zego_register_media_player_load_resource_callback(zego
  * Callback for media player seek to playback progress
  *
  * @param seq Sequence.
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param instance_index Media player instance index
  * @param user_context Context of user.
  */

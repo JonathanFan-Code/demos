@@ -10,7 +10,6 @@ namespace ZEGO {
     namespace EXPRESS {
 
         class IZegoMediaPlayer;
-        class IZegoAudioEffectPlayer;
 
 
         class IZegoExpressEngine
@@ -109,23 +108,7 @@ namespace ZEGO {
             virtual void logoutRoom(const std::string& roomID) = 0;
 
             /**
-             * Switch the room with advanced room configurations
-             *
-             * After successfully login room, if you need to quickly switch to the next room, you can call this API.
-             * Calling this API is faster and easier to use than calling [logoutRoom] and then [loginRoom].
-             * When this API is called, all streams currently publishing or playing will stop (but the local preview will not stop).
-             * To prevent the app from being impersonated by a malicious user, you can add authentication before logging in to the room, that is, the [token] parameter in the ZegoRoomConfig object passed in by the [config] parameter. This parameter configuration affects the room to be switched over.
-             *
-             * @param fromRoomID Current roomID
-             * @param toRoomID The next roomID
-             * @param config Advanced room configuration
-             */
-            virtual void switchRoom(const std::string& fromRoomID, const std::string& toRoomID, ZegoRoomConfig* config = nullptr) = 0;
-
-            /**
-             * Set room extra information
-             *
-             * After the user in the room calls this api to set the extra info of the room, other users in the same room will be notified through the [onRoomExtraInfoUpdate] callback api
+             * Set room extra infomation
              *
              * @param roomID Room ID.
              * @param key key of the extra info.
@@ -141,7 +124,7 @@ namespace ZEGO {
              * Before you start to publish the stream, you need to join the room first by calling [loginRoom]. Other users in the same room can get the streamID by monitoring the [onRoomStreamUpdate] event callback after the local user publishing stream successfully.
              * In the case of poor network quality, user publish may be interrupted, and the SDK will attempt to reconnect. You can learn about the current state and error information of the stream published by monitoring the [onPublisherStateUpdate] event.
              *
-             * @param streamID Stream ID, a string of up to 256 characters, needs to be globally unique within the entire AppID. If in the same AppID, different users publish each stream and the stream ID is the same, which will cause the user to publish the stream failure. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
+             * @param streamID Stream ID, a string of up to 256 characters, needs to be globally unique within the entire AppID. If in the same AppID, different users publish each stream and the stream ID is the same, which will cause the user to publish the stream failure. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
              * @param channel Publish stream channel
              */
             virtual void startPublishingStream(const std::string& streamID, ZegoPublishChannel channel = ZEGO_PUBLISH_CHANNEL_MAIN) = 0;
@@ -308,16 +291,6 @@ namespace ZEGO {
             virtual void setCaptureVolume(int volume) = 0;
 
             /**
-             * Set audio capture stereo mode
-             *
-             * This API is used to set the audio stereo capture mode. The default is mono, that is, dual channel collection is not enabled.
-             * It needs to be invoked before [startPublishingStream], [startPlayingStream] or [startPreview] to take effect.
-             *
-             * @param mode Audio stereo capture mode
-             */
-            virtual void setAudioCaptureStereoMode(ZegoAudioCaptureStereoMode mode) = 0;
-
-            /**
              * Adds a target CDN URL to which the stream will be relayed from ZEGO's cloud streaming server.
              *
              * You can call this api to publish the audio and video streams that have been published to the ZEGO real-time audio and video cloud to a custom CDN content distribution network that has high latency but supports high concurrent playing stream.
@@ -360,7 +333,7 @@ namespace ZEGO {
             /**
              * Sets up the stream watermark before stream publishing (for the specified channel).
              *
-             * The layout of the watermark cannot exceed the video encoding resolution of the stream. It can be set at any time before or during the publishing stream.
+             * Set before publishing. The layout of the watermark cannot exceed the video encoding resolution of stream.
              *
              * @param watermark The upper left corner of the watermark layout is the origin of the coordinate system, and the area cannot exceed the size set by the encoding resolution. If it is nullptr, the watermark is cancelled.
              * @param isPreviewVisible the watermark is visible on local preview
@@ -414,7 +387,7 @@ namespace ZEGO {
              * Playing the stream ID that does not exist, the SDK continues to try to play after executing this interface. After the stream ID is successfully published, the audio and video stream can be actually played.
              * The developer can update the player canvas by calling this interface again (the streamID must be the same).
              *
-             * @param streamID Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
+             * @param streamID Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
              * @param canvas The view used to display the play audio and video stream's image. If the view is set to [nullptr], it will not be displayed.
              */
             virtual void startPlayingStream(const std::string& streamID, ZegoCanvas* canvas) = 0;
@@ -428,7 +401,7 @@ namespace ZEGO {
              * Playing the stream ID that does not exist, the SDK continues to try to play after executing this interface. After the stream ID is successfully published, the audio and video stream can be actually played.
              * The developer can update the player canvas by calling this interface again (the streamID must be the same).
              *
-             * @param streamID Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
+             * @param streamID Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
              * @param canvas The view used to display the play audio and video stream's image. If the view is set to [nullptr], it will not be displayed.
              * @param config Advanced player configuration
              */
@@ -498,7 +471,7 @@ namespace ZEGO {
              * Due to the performance considerations of the client device, ZegoExpressEngine's mix stream is to start the mixing stream task on the server side of the ZEGO audio and video cloud for mixing stream.
              * After calling this api, SDK initiates a mixing stream request to the ZEGO audio and video cloud. The ZEGO audio and video cloud will find the current publishing stream and perform video layer blending according to the parameters of the mixing stream task requested by ZegoExpressEngine.
              * When you need to update the mixing stream task, that is, the input stream list needs to be updated when the input stream increases or decreases, you can update the field of the [ZegoMixerTask] object inputList and call this api again to pass the same [ZegoMixerTask] object to update the mixing stream task.
-             * If an exception occurs when requesting to start the mixing stream task, for example, the most common mix input stream does not exist, it will be given from the callback error code. For specific error codes, please refer to the Error Codes https://doc-en.zego.im/en/308.html
+             * If an exception occurs when requesting to start the mixing stream task, for example, the most common mix input stream does not exist, it will be given from the callback error code. For specific error codes, please refer to the common error code documentation [https://doc-en.zego.im/en/308.html].
              * If an input stream does not exist in the middle, the mixing stream task will automatically retry playing the input stream for 90 seconds, and will not retry after 90 seconds.
              *
              * @param task Mix stream task object
@@ -558,14 +531,6 @@ namespace ZEGO {
             virtual bool isSpeakerMuted() = 0;
 
             /**
-             * Gets a list of audio devices.
-             *
-             * @param deviceType Audio device type
-             * @return Audo device List
-             */
-            virtual std::vector<ZegoDeviceInfo> getAudioDeviceList(ZegoAudioDeviceType deviceType) = 0;
-
-            /**
              * Chooses to use the specified audio device.
              *
              * @param deviceType Audio device type
@@ -574,24 +539,12 @@ namespace ZEGO {
             virtual void useAudioDevice(ZegoAudioDeviceType deviceType, const std::string& deviceID) = 0;
 
             /**
-             * Get volume for the specified audio device.
+             * Gets a list of audio devices.
              *
              * @param deviceType Audio device type
-             * @param deviceID ID of a device obtained by getAudioDeviceList
-             * @return device volume
+             * @return Audo device List
              */
-            virtual int getAudioDeviceVolume(ZegoAudioDeviceType deviceType, const std::string& deviceID) = 0;
-
-            /**
-             * Set volume for the specified audio device.
-             *
-             * The direct operating system device may fail due to system restrictions. Please use setCaptureVolume and setPlayVolume first to adjust the volume of publish and play streams
-             *
-             * @param deviceType Audio device type
-             * @param deviceID ID of a device obtained by getAudioDeviceList
-             * @param volume device volume
-             */
-            virtual void setAudioDeviceVolume(ZegoAudioDeviceType deviceType, const std::string& deviceID, int volume) = 0;
+            virtual std::vector<ZegoDeviceInfo> getAudioDeviceList(ZegoAudioDeviceType deviceType) = 0;
 
             /**
              * Enables or disables the audio capture device.
@@ -634,11 +587,9 @@ namespace ZEGO {
              *
              * After starting monitoring, you can receive local audio sound level via [onCapturedSoundLevelUpdate] callback, and receive remote audio sound level via [onRemoteSoundLevelUpdate] callback.
              * Before entering the room, you can call [startPreview] with this api and combine it with [onCapturedSoundLevelUpdate] callback to determine whether the audio device is working properly.
-             * [onCapturedSoundLevelUpdate] and [onRemoteSoundLevelUpdate] callback notification period is the value set by the parameter.
-             *
-             * @param millisecond Monitoring time period of the sound level, in milliseconds, has a value range of [100, 3000]. Default is 100 ms.
+             * [onCapturedSoundLevelUpdate] and [onRemoteSoundLevelUpdate] callback notification period is 100 ms.
              */
-            virtual void startSoundLevelMonitor(unsigned int millisecond = 100) = 0;
+            virtual void startSoundLevelMonitor() = 0;
 
             /**
              * Stops sound level monitoring.
@@ -651,11 +602,9 @@ namespace ZEGO {
              * Starts audio spectrum monitoring.
              *
              * After starting monitoring, you can receive local audio spectrum via [onCapturedAudioSpectrumUpdate] callback, and receive remote audio spectrum via [onRemoteAudioSpectrumUpdate] callback.
-             * [onCapturedAudioSpectrumUpdate] and [onRemoteAudioSpectrumUpdate] callback notification period is the value set by the parameter.
-             *
-             * @param millisecond Monitoring time period of the audio spectrum, in milliseconds, has a value range of [100, 3000]. Default is 100 ms.
+             * [onCapturedAudioSpectrumUpdate] and [onRemoteAudioSpectrumUpdate] callback notification period is 100 ms.
              */
-            virtual void startAudioSpectrumMonitor(unsigned int millisecond = 100) = 0;
+            virtual void startAudioSpectrumMonitor() = 0;
 
             /**
              * Stops audio spectrum monitoring.
@@ -796,7 +745,7 @@ namespace ZEGO {
             /**
              * Sets up the reverberation parameters.
              *
-             * Different values set dynamically after a successful publishing will take effect, When all of the parameters is set to 0, the reverb is turned off.
+             * Different values set dynamically after a successful publishing will take effect, When any of the parameters is set to 0.0, the reverb is turned off.
              *
              * @param param Reverb parameter
              */
@@ -808,18 +757,18 @@ namespace ZEGO {
              * Note: You need to set up a dual channel setAudioConfig for the virtual stereo to take effect!
              *
              * @param enable true to turn on the virtual stereo, false to turn off the virtual stereo
-             * @param angle angle of the sound source in the virtual stereo, ranging from 0 to 180, with 90 being the front, and 0 and 180 being respectively Corresponds to rightmost and leftmost, usually use 90.
+             * @param angle angle of the sound source in the virtual stereo, ranging from 0 to 180, with 90 being the front, and 0 and 180 being respectively Corresponds to rightmost and leftmost, usually defaults to 90.
              */
             virtual void enableVirtualStereo(bool enable, int angle) = 0;
 
             /**
-             * Sends a Broadcast Message
+             * Sends a Broadcast Message, which will be delivered to the first 500 users in the room.
              *
              * The total sending frequency limit of [sendBroadcastMessage] and [sendCustomCommand] is 600 times per minute by default.
-             * Users of a certain number of advanced rooms in the same room can receive this callback. It is generally used when the number of people in the live room is less than a certain number. The specific number is determined by the configuration of the ZEGO server.
+             * Users of up to the first 500 advanced rooms in the same room can receive it, which is generally used when the number of live broadcast rooms is less than 500.
              *
              * @param roomID Room ID, a string of up to 128 bytes in length. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'
-             * @param message Message content, no longer than 1024 bytes
+             * @param message Message content, no longer than 256 bytes
              * @param callback Send broadcast message result callback
              */
             virtual void sendBroadcastMessage(const std::string& roomID, const std::string& message, ZegoIMSendBroadcastMessageCallback callback) = 0;
@@ -828,10 +777,10 @@ namespace ZEGO {
              * Sends a Barrage Message (bullet screen) to all users in the same room, without guaranteeing the delivery.
              *
              * There is no limit on the number of transmissions, but the server will actively drop messages if it is sent too frequently.
-             * The api [sendBroadcastMessage] only supports that a certain number of users who entered the room can receive the sent message，but [sendBarrageMessage] can be received by users with more than the number of people in the same room, but it is not reliable, that is, when there are many users in the room or messages are sent frequently between users, the users who receive the messages may not be able to receive them. Generally used for sending live barrage.
+             * It can be received by users with more than 500 people in the same room, but it is not reliable, that is, when there are many users in the room or messages are sent frequently between users, the users who receive the messages may not be able to receive them. Generally used for sending live barrage.
              *
              * @param roomID Room ID, a string of up to 128 bytes in length. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'
-             * @param message Message content, no longer than 1024 bytes
+             * @param message Message content, no longer than 256 bytes
              * @param callback Send barrage message result callback
              */
             virtual void sendBarrageMessage(const std::string& roomID, const std::string& message, ZegoIMSendBarrageMessageCallback callback) = 0;
@@ -843,7 +792,7 @@ namespace ZEGO {
              * The type of point-to-point signaling in the same room is generally used for remote control signaling or message sending between users.
              *
              * @param roomID Room ID, a string of up to 128 bytes in length. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'
-             * @param command Custom command content, no longer than 1024 bytes
+             * @param command Custom command content, no longer than 256 bytes
              * @param toUserList The users who will receive the command
              * @param callback Send command result callback
              */
@@ -864,22 +813,6 @@ namespace ZEGO {
              * @param mediaPlayer The media player instance object to be destroyed
              */
             virtual void destroyMediaPlayer(IZegoMediaPlayer*& mediaPlayer) = 0;
-
-            /**
-             * Creates a audio effect player instance.
-             *
-             * Currently, a maximum of 1 instances can be created, after which it will return nullptr.
-             *
-             * @return audio effect player instance, nullptr will be returned when the maximum number is exceeded.
-             */
-            virtual IZegoAudioEffectPlayer* createAudioEffectPlayer() = 0;
-
-            /**
-             * Destroys a audio effect player instance.
-             *
-             * @param audioEffectPlayer The audio effect player instance object to be destroyed
-             */
-            virtual void destroyAudioEffectPlayer(IZegoAudioEffectPlayer*& audioEffectPlayer) = 0;
 
             /**
              * Starts to record locally captured audio or video and directly save the data to a file.
@@ -1030,7 +963,7 @@ namespace ZEGO {
              * The callback to the corresponding setting of [setAudioDataHandler] is triggered when this interface is called and at publishing stream state or playing stream state.
              *
              * @param enable Whether to enable audio data callback
-             * @param callbackBitMask The callback api bitmask marker for receive audio data, refer to enum [ZegoAudioDataCallbackBitMask], when this param converted to binary, 0b01 that means 1 << 0 for triggering [onCapturedAudioData], 0x10 that means 1 << 1 for triggering [onPlaybackAudioData], 0x100 that means 1 << 2 for triggering [onMixedAudioData].The masks can be combined to allow different callbacks to be triggered simultaneously.
+             * @param callbackBitMask The callback api bitmask marker for receive audio data, refer to enum [ZegoAudioDataCallbackBitMask], when this param converted to binary, 0x01 for triggering [onCapturedAudioData], 0x10 for triggering [onRemoteAudioData], 0x100 for triggering [onMixedAudioData].The masks can be combined to allow different callbacks to be triggered simultaneously.
              * @param param param of audio frame
              */
             virtual void enableAudioDataCallback(bool enable, unsigned int callbackBitMask, ZegoAudioFrameParam param) = 0;
@@ -1099,143 +1032,6 @@ namespace ZEGO {
              * @param mute Whether to disable audio output to the device, true: disable audio output, false: enable audio output
              */
             virtual void muteAudioOutput(bool mute) = 0;
-
-        };
-
-
-        class IZegoAudioEffectPlayer
-        {
-        protected:
-
-            virtual ~IZegoAudioEffectPlayer() {}
-
-        public:
-
-            /**
-             * set audio effect player event handler
-             *
-             * @param handler event handler for audio effect player
-             */
-            virtual void setEventHandler(std::shared_ptr<IZegoAudioEffectPlayerEventHandler> handler) = 0;
-
-            /**
-             * Start playing audio effect
-             *
-             * The default is only played once and is not mixed into the publishing stream, if you want to change this please modify [config].
-             *
-             * @param audioEffectID ID for the audio effect. The SDK uses audioEffectID to control the playback of sound effects. The SDK does not force the user to pass in this parameter as a fixed value. It is best to ensure that each sound effect can have a unique id. The recommended methods are static self-incrementing id or the hash of the incoming sound effect file path.
-             * @param path The absolute path of the local resource. `assets://`、`ipod-library://` and network url are not supported. Set path as nullptr if resource is loaded already using [loadResource]
-             * @param config Audio effect playback configuration. Set nullptr will only be played once, and will not be mixed into the publishing stream.
-             */
-            virtual void start(unsigned int audioEffectID, const std::string& path, ZegoAudioEffectPlayConfig* config = nullptr) = 0;
-
-            /**
-             * Stop playing audio effect
-             *
-             * @param audioEffectID ID for the audio effect
-             */
-            virtual void stop(unsigned int audioEffectID) = 0;
-
-            /**
-             * Pause playing audio effect
-             *
-             * @param audioEffectID ID for the audio effect
-             */
-            virtual void pause(unsigned int audioEffectID) = 0;
-
-            /**
-             * Resume playing audio effect
-             *
-             * @param audioEffectID ID for the audio effect
-             */
-            virtual void resume(unsigned int audioEffectID) = 0;
-
-            /**
-             * Stop playing all audio effect
-             */
-            virtual void stopAll() = 0;
-
-            /**
-             * Pause playing all audio effect
-             */
-            virtual void pauseAll() = 0;
-
-            /**
-             * Resume playing all audio effect
-             */
-            virtual void resumeAll() = 0;
-
-            /**
-             * Set the specified playback progress
-             *
-             * Unit is millisecond
-             *
-             * @param audioEffectID ID for the audio effect
-             * @param millisecond Point in time of specified playback progress
-             * @param callback seek to result
-             */
-            virtual void seekTo(unsigned int audioEffectID, unsigned long long millisecond, ZegoAudioEffectPlayerSeekToCallback callback) = 0;
-
-            /**
-             * Set volume for the audio effect. Both the local play volume and the publish volume are set
-             *
-             * @param audioEffectID ID for the audio effect
-             * @param volume The range is 0 ~ 200. The default is 100.
-             */
-            virtual void setVolume(unsigned int audioEffectID, int volume) = 0;
-
-            /**
-             * Set volume for all audio effect. Both the local play volume and the publish volume are set
-             *
-             * @param volume The range is 0 ~ 200. The default is 100.
-             */
-            virtual void setVolumeAll(int volume) = 0;
-
-            /**
-             * Get the total progress of your media resources
-             *
-             * You should load resource before invoking this API, otherwise the return value is 0
-             *
-             * @param audioEffectID ID for the audio effect
-             * @return Unit is millisecond
-             */
-            virtual unsigned long long getTotalDuration(unsigned int audioEffectID) = 0;
-
-            /**
-             * Get current playing progress
-             *
-             * You should load resource before invoking this API, otherwise the return value is 0
-             *
-             * @param audioEffectID ID for the audio effect
-             */
-            virtual unsigned long long getCurrentProgress(unsigned int audioEffectID) = 0;
-
-            /**
-             * Load audio effect resource
-             *
-             * In a scene where the same sound effect is played frequently, the SDK provides the function of preloading the sound effect file into the memory in order to optimize the performance of repeatedly reading and decoding the file. Preloading supports loading up to 15 sound effect files at the same time, and the duration of the sound effect files cannot exceed 30s, otherwise an error will be reported when loading
-             *
-             * @param audioEffectID ID for the audio effect
-             * @param path the absolute path of the audio effect resource.
-             * @param callback load audio effect resource result
-             */
-            virtual void loadResource(unsigned int audioEffectID, const std::string& path, ZegoAudioEffectPlayerLoadResourceCallback callback) = 0;
-
-            /**
-             * Unload audio effect resource
-             *
-             * After the sound effects are used up, related resources can be released through this interface; otherwise, the SDK will release the loaded resources when the AudioEffectPlayer instance is destroyed.
-             *
-             * @param audioEffectID ID for the audio effect loaded
-             */
-            virtual void unloadResource(unsigned int audioEffectID) = 0;
-
-            /**
-             * Get audio effect player index
-             *
-             * @return Audio effect player index
-             */
-            virtual int getIndex() = 0;
 
         };
         /**
@@ -1352,25 +1148,11 @@ namespace ZEGO {
             virtual void setPlayerCanvas(ZegoCanvas* canvas) = 0;
 
             /**
-             * Set mediaplayer volume. Both the local play volume and the publish volume are set
+             * Set player volume
              *
-             * @param volume The range is 0 ~ 200. The default is 60.
+             * @param volume The range is 0 ~ 100. The default is 50.
              */
             virtual void setVolume(int volume) = 0;
-
-            /**
-             * Set mediaplayer local play volume
-             *
-             * @param volume The range is 0 ~ 200. The default is 60.
-             */
-            virtual void setPlayVolume(int volume) = 0;
-
-            /**
-             * Set mediaplayer publish volume
-             *
-             * @param volume The range is 0 ~ 200. The default is 60.
-             */
-            virtual void setPublishVolume(int volume) = 0;
 
             /**
              * Set playback progress callback interval
@@ -1383,14 +1165,11 @@ namespace ZEGO {
             virtual void setProgressInterval(unsigned long long millisecond) = 0;
 
             /**
-             * Gets the current local playback volume of the mediaplayer, the range is 0 ~ 200, with the default value of 60
+             * Get the current volume
+             *
+             * The range is 0 ~ 100. The default is 50
              */
-            virtual int getPlayVolume() = 0;
-
-            /**
-             * Gets the current publish volume of the mediaplayer, the range is 0 ~ 200, with the default value of 60
-             */
-            virtual int getPublishVolume() = 0;
+            virtual int getVolume() = 0;
 
             /**
              * Get the total progress of your media resources
@@ -1417,13 +1196,6 @@ namespace ZEGO {
              * Get media player index
              */
             virtual int getIndex() = 0;
-
-            /**
-             * Gets the play volume
-             *
-             * @deprecated This interface is deprecated, please use `getPlayVolume` and `getPublishVolume` to get the corresponding local playback volume and publish volume.
-             */
-            virtual int getVolume() = 0;
 
         };
 

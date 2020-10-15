@@ -8,7 +8,6 @@ namespace ZEGO {
     namespace EXPRESS {
 
         class IZegoMediaPlayer;
-        class IZegoAudioEffectPlayer;
 
 
         class IZegoEventHandler
@@ -24,7 +23,7 @@ namespace ZEGO {
              *
              * When the APIs are not used correctly, the callback prompts for detailed error information, which is controlled by the [setDebugVerbose] interface
              *
-             * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+             * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
              * @param funcName Function name
              * @param info Detailed error information
              */
@@ -51,7 +50,7 @@ namespace ZEGO {
              *
              * @param roomID Room ID, a string of up to 128 bytes in length.
              * @param state Changed room state
-             * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+             * @param errorCode Error code, please refer to the [common error code document](https://doc-en.zego.im/en/308.html) for details
              * @param extendedData Extended Information with state updates. As the standby, only an empty json table is currently returned
              */
             virtual void onRoomStateUpdate(const std::string& /*roomID*/, ZegoRoomState /*state*/, int /*errorCode*/, const std::string& /*extendedData*/) {
@@ -137,7 +136,7 @@ namespace ZEGO {
              *
              * @param streamID Stream ID
              * @param state Status of publishing stream
-             * @param errorCode The error code corresponding to the status change of the publish stream. Please refer to the Error Codes https://doc-en.zego.im/en/308.html for details.
+             * @param errorCode The error code corresponding to the status change of the publish stream. Please refer to the common error code documentation [https://doc-en.zego.im/en/308.html] for details.
              * @param extendedData Extended information with state updates.
              */
             virtual void onPublisherStateUpdate(const std::string& /*streamID*/, ZegoPublisherState /*state*/, int /*errorCode*/, const std::string& /*extendedData*/) {
@@ -219,7 +218,7 @@ namespace ZEGO {
              *
              * @param streamID stream ID
              * @param state Current play state
-             * @param errorCode The error code corresponding to the status change of the playing stream. Please refer to the Error Codes https://doc-en.zego.im/en/308.html for details.
+             * @param errorCode The error code corresponding to the status change of the playing stream. Please refer to the common error code documentation [https://doc-en.zego.im/en/308.html] for details.
              * @param extendedData Extended Information with state updates. As the standby, only an empty json table is currently returned
              */
             virtual void onPlayerStateUpdate(const std::string& /*streamID*/, ZegoPlayerState /*state*/, int /*errorCode*/, const std::string& /*extendedData*/) {
@@ -413,7 +412,7 @@ namespace ZEGO {
              *
              * This callback is triggered when an exception occurs when reading or writing the audio and video device.
              *
-             * @param errorCode The error code corresponding to the status change of the playing stream. Please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+             * @param errorCode The error code corresponding to the status change of the playing stream. Please refer to the common error code documentation [https://doc-en.zego.im/en/308.html] for details
              * @param deviceName device name
              */
             virtual void onDeviceError(int /*errorCode*/, const std::string& /*deviceName*/) {
@@ -516,7 +515,7 @@ namespace ZEGO {
              *
              * @param mediaPlayer Callback player object
              * @param state Media player status
-             * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+             * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
              */
             virtual void onMediaPlayerStateUpdate(IZegoMediaPlayer* /*mediaPlayer*/, ZegoMediaPlayerState /*state*/, int /*errorCode*/) {
 
@@ -591,31 +590,6 @@ namespace ZEGO {
         };
 
 
-        class IZegoAudioEffectPlayerEventHandler
-        {
-        protected:
-
-            virtual ~IZegoAudioEffectPlayerEventHandler() {}
-
-        public:
-
-            /**
-             * Audio effect playback state callback
-             *
-             * This callback is triggered when the playback state of a audio effect of the audio effect player changes.
-             *
-             * @param audioEffectPlayer Audio effect player instance that triggers this callback
-             * @param audioEffectID The ID of the audio effect resource that triggered this callback
-             * @param state The playback state of the audio effect
-             * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
-             */
-            virtual void onAudioEffectPlayStateUpdate(IZegoAudioEffectPlayer* /*audioEffectPlayer*/, unsigned int /*audioEffectID*/, ZegoAudioEffectPlayState /*state*/, int /*errorCode*/) {
-
-            }
-
-        };
-
-
         class IZegoDataRecordEventHandler
         {
         protected:
@@ -628,7 +602,7 @@ namespace ZEGO {
              * The callback triggered when the state of data recording (to a file) changes.
              *
              * @param state File recording status, according to which you should determine the state of the file recording or the prompt of the UI.
-             * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+             * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
              * @param config Record config
              * @param channel Publishing stream channel
              */
@@ -671,19 +645,6 @@ namespace ZEGO {
              * @param channel Publishing stream channel
              */
             virtual void onStop(ZegoPublishChannel channel) = 0;
-
-            /**
-             * SDK detects network changes and informs developers that it needs to do traffic control
-             * In the case of custom video capture by sending encoded data, the SDK cannot know the external encoding configuration, so the traffic control operation needs to be completed by the developer.
-             * The SDK will notify the developer of the recommended value of the video configuration according to the current network situation, and the developer needs to modify the encoder configuration by himself to ensure the smoothness of video transmission
-             * Please do not perform time-consuming operations in this callback. If you need to perform time-consuming operations, please switch threads
-             *
-             * @param trafficControlInfo traffic control info
-             * @param channel Publishing stream channel
-             */
-            virtual void onEncodedDataTrafficControl(ZegoTrafficControlInfo /*trafficControlInfo*/, ZegoPublishChannel /*channel*/) {
-
-            }
 
         };
 
@@ -783,7 +744,7 @@ namespace ZEGO {
              * The callback for obtaining the audio data captured by the local microphone.
              *
              * In non-custom audio capture mode, the SDK capture the microphone's sound, but the developer may also need to get a copy of the The audio data captured by the SDK SDK is available through this callback.
-             * On the premise of calling [setAudioDataHandler] to set the listener callback, after calling [enableAudioDataCallback] to set the mask 0b01 that means 1 << 0, this callback will be triggered only when it is in the publishing stream state.
+             * On the premise of calling [setAudioDataHandler] to set the listener callback, after calling [enableAudioDataCallback] to set the mask 0x01, this callback will be triggered only when it is in the publishing stream state.
              *
              * @param data audio data of pcm format
              * @param dataLength length of data
@@ -797,29 +758,13 @@ namespace ZEGO {
              * The callback for obtaining the audio data of all the remote streams pulled.
              *
              * This method will callback all of the remote user's audio mix data. This callback can be used for that you needs to fetch all the playing streams to proccess.
-             * On the premise of calling [setAudioDataHandler] to set the listener callback, after calling [enableAudioDataCallback] to set the mask 0b10 that means 1 << 1, this callback will be triggered only when it is in the playing stream state.
+             * On the premise of calling [setAudioDataHandler] to set the listener callback, after calling [enableAudioDataCallback] to set the mask 0x02, this callback will be triggered only when it is in the playing stream state.
              *
-             * @deprecated This interface is deprecated, please use the [onPlaybackAudioData] interface
              * @param data audio data of pcm format
              * @param dataLength length of data
              * @param param param of audio frame
              */
             virtual void onRemoteAudioData(const unsigned char* /*data*/, unsigned int /*dataLength*/, ZegoAudioFrameParam /*param*/) {
-
-            }
-
-            /**
-             * The callback for obtaining the audio data of all the streams playback by SDK.
-             *
-             * This method will callback all the mixed audio data to be playback. This callback can be used for that you needs to fetch all the mixed audio data to be playback to proccess.
-             * On the premise of calling [setAudioDataHandler] to set the listener callback, after calling [enableAudioDataCallback] to set the mask 0b100 that means 1 << 2, this callback will be triggered only when it is in the SDK inner audio and video engine started(called the [startPreivew] or [startPlayingStream] or [startPublishingStream]).
-             * When the engine is started in the non-playing stream state or the media player is not used to play the media file, the audio data to be called back is muted audio data.
-             *
-             * @param data audio data of pcm format
-             * @param dataLength length of data
-             * @param param param of audio frame
-             */
-            virtual void onPlaybackAudioData(const unsigned char* /*data*/, unsigned int /*dataLength*/, ZegoAudioFrameParam /*param*/) {
 
             }
 

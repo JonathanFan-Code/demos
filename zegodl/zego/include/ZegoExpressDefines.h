@@ -19,16 +19,12 @@
 #endif
 
 #if TARGET_OS_OSX || TARGET_OS_IPHONE
+#import <Foundation/Foundation.h>
 #define ZegoStrncpy strncpy
 #endif
 
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(LINUX)
 #define ZegoStrncpy strncpy
-#endif
-
-#if defined(__unix__)
-#define ZegoStrncpy strncpy
-#include <string.h>
 #endif
 
 #ifdef ZEGO_DISABLE_SWTICH_THREAD
@@ -40,7 +36,6 @@
         std::function<void(void)>* pFunc = new std::function<void(void)>;*pFunc = [=](void) {
 #define ZEGO_SWITCH_THREAD_ING }; oInternalOriginBridge->postWindowsMessage(pFunc);
 #elif TARGET_OS_OSX || TARGET_OS_IPHONE
-#import <Foundation/Foundation.h>
 #define ZEGO_SWITCH_THREAD_PRE dispatch_async(dispatch_get_main_queue(), ^{;
 #define ZEGO_SWITCH_THREAD_ING });
 #else
@@ -280,20 +275,6 @@ namespace ZEGO {
 
             /** Stereo */
             ZEGO_AUDIO_CHANNEL_STEREO = 2
-
-        };
-
-        /** Audio capture stereo mode */
-        enum ZegoAudioCaptureStereoMode
-        {
-            /** Disable capture stereo, i.e. capture mono */
-            ZEGO_AUDIO_CAPTURE_STEREO_MODE_NONE = 0,
-
-            /** Always enable capture stereo */
-            ZEGO_AUDIO_CAPTURE_STEREO_MODE_ALWAYS = 1,
-
-            /** Adaptive mode, capture stereo when publishing stream only, capture mono when publishing and playing stream (e.g. talk/intercom scenes) */
-            ZEGO_AUDIO_CAPTURE_STEREO_MODE_ADAPTIVE = 2
 
         };
 
@@ -739,23 +720,6 @@ namespace ZEGO {
 
         };
 
-        /** AudioEffectPlayer state */
-        enum ZegoAudioEffectPlayState
-        {
-            /** Not playing */
-            ZEGO_AUDIO_EFFECT_PLAY_STATE_NO_PLAY = 0,
-
-            /** Playing */
-            ZEGO_AUDIO_EFFECT_PLAY_STATE_PLAYING = 1,
-
-            /** Pausing */
-            ZEGO_AUDIO_EFFECT_PLAY_STATE_PAUSING = 2,
-
-            /** End of play */
-            ZEGO_AUDIO_EFFECT_PLAY_STATE_PLAY_ENDED = 3
-
-        };
-
         /** volume type */
         enum ZegoVolumeType
         {
@@ -847,8 +811,8 @@ namespace ZEGO {
             /** The mask bit of this field corresponds to the enable [onCapturedAudioData] callback interface */
             ZEGO_AUDIO_DATA_CALLBACK_BIT_MASK_CAPTURED = 1 << 0,
 
-            /** The mask bit of this field corresponds to the enable [onPlaybackAudioData] callback interface */
-            ZEGO_AUDIO_DATA_CALLBACK_BIT_MASK_PLAYBACK = 1 << 1,
+            /** The mask bit of this field corresponds to the enable [onRemoteAudioData] callback interface */
+            ZEGO_AUDIO_DATA_CALLBACK_BIT_MASK_REMOTE = 1 << 1,
 
             /** The mask bit of this field corresponds to the enable [onMixedAudioData] callback interface */
             ZEGO_AUDIO_DATA_CALLBACK_BIT_MASK_MIXED = 1 << 2
@@ -936,7 +900,7 @@ namespace ZEGO {
             /** @deprecated This configuration is deprecated after 1.9.0. Please use the ZegoExpressEngine's [enableCustomVideoRender] method instead */
             ZegoCustomVideoRenderConfig* customVideoRenderConfig;
 
-            /** Other special function switches, if not set, no special function will be used by default. Please contact ZEGO technical support before use. */
+            /** Other special function switches, if not set, no other special functions are used by default. Please contact ZEGO technical support before use. */
             std::unordered_map<std::string, std::string> advancedConfig;
 
             ZegoEngineConfig(){
@@ -961,7 +925,7 @@ namespace ZEGO {
             /** Whether to enable the user in and out of the room callback notification [onRoomUserUpdate], the default is off. If developers need to use ZEGO Room user notifications, make sure that each user who login sets this flag to true */
             bool isUserStatusNotify;
 
-            /** The token issued by the developer's business server is used to ensure security. The generation rules are detailed in Room Login Authentication Description https://doc-en.zego.im/en/3881.html Default is empty string, that is, no authentication */
+            /** The token issued by the developer's business server is used to ensure security. The generation rules are detailed in [https://doc.zego.im/CN/565.html](https://doc.zego.im/CN/565.html). Default is empty string, that is, no authentication */
             std::string token;
 
             ZegoRoomConfig():maxMemberCount(0), isUserStatusNotify(false), token(""){
@@ -1055,32 +1019,13 @@ namespace ZEGO {
         };
 
         /**
-         * Externally encoded data traffic control information
-         */
-        struct ZegoTrafficControlInfo
-        {
-            /** Video resolution width to be adjusted */
-            int width;
-
-            /** Video resolution height to be adjusted */
-            int height;
-
-            /** Video FPS to be adjusted */
-            int fps;
-
-            /** Video bitrate in kbps to be adjusted */
-            int bitrate;
-
-        };
-
-        /**
-         * Voice changer parameter
+         * Video config
          *
-         * Developer can use the built-in presets of the SDK to change the parameters of the voice changer.
+         * developer can use the built-in presets of the SDK to change the parameters of the voice changer
          */
         struct ZegoVoiceChangerParam
         {
-            /** Pitch parameter, value range [-8.0, 8.0], the larger the value, the sharper the sound, set it to 0.0 to turn off. Note that the voice changer effect is only valid for the captured sound. */
+            /** pitch */
             float pitch;
 
             ZegoVoiceChangerParam(ZegoVoiceChangerPreset preset = ZEGO_VOICE_CHANGER_PRESET_NONE){
@@ -1194,7 +1139,7 @@ namespace ZEGO {
             /** User object instance */
             ZegoUser user;
 
-            /** Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'. */
+            /** Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'. */
             std::string streamID;
 
             /** Stream extra info */
@@ -1508,7 +1453,7 @@ namespace ZEGO {
          */
         struct ZegoMixerInput
         {
-            /** Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'. */
+            /** Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'. */
             std::string streamID;
 
             /** Mix stream content type */
@@ -1683,9 +1628,6 @@ namespace ZEGO {
             /** Whether it is a keyframe */
             bool isKeyFrame;
 
-            /** Video frame rotation */
-            int rotation;
-
             /** Video frame width */
             int width;
 
@@ -1804,7 +1746,7 @@ namespace ZEGO {
          */
         struct ZegoDataRecordConfig
         {
-            /** The path to save the recording file, absolute path, need to include the file name, the file name need to specify the suffix, currently only support .mp4 or .flv, if multiple recording for the same path, will overwrite the file with the same name. The maximum length should be less than 1024 bytes. */
+            /** The path to save the recording file, absolute path, need to include the file name, the file name need to specify the suffix, currently only support .mp4 or .flv, if multiple recording for the same path, will overwrite the file with the same name. */
             std::string filePath;
 
             /** Type of recording media */
@@ -1826,19 +1768,6 @@ namespace ZEGO {
         };
 
         /**
-         * AudioEffectPlayer play configuration
-         */
-        struct ZegoAudioEffectPlayConfig
-        {
-            /** The number of play counts. When set to 0, it will play in an infinite loop until the user invoke [stop]. The default is 1, which means it will play only once. */
-            unsigned int playCount;
-
-            /** Whether to mix audio effects into the publishing stream, the default is false. */
-            bool isPublishOut;
-
-        };
-
-        /**
          * Callback for asynchronous destruction completion
          *
          * In general, developers do not need to listen to this callback.
@@ -1849,7 +1778,7 @@ namespace ZEGO {
         /**
          * Callback for setting room extra information
          *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+         * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
          */
         using ZegoRoomSetRoomExtraInfoCallback = std::function<void (int errorCode)>;
 
@@ -1857,7 +1786,7 @@ namespace ZEGO {
         /**
          * Callback for setting stream extra information
          *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+         * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
          */
         using ZegoPublisherSetStreamExtraInfoCallback = std::function<void (int errorCode)>;
 
@@ -1865,7 +1794,7 @@ namespace ZEGO {
         /**
          * Callback for add/remove CDN URL
          *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+         * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
          */
         using ZegoPublisherUpdateCdnUrlCallback = std::function<void (int errorCode)>;
 
@@ -1873,7 +1802,7 @@ namespace ZEGO {
         /**
          * Results of starting a mixer task
          *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+         * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
          * @param extendedData Extended Information
          */
         using ZegoMixerStartCallback = std::function<void (int errorCode, std::string extendedData)>;
@@ -1882,7 +1811,7 @@ namespace ZEGO {
         /**
          * Results of stoping a mixer task
          *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+         * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
          */
         using ZegoMixerStopCallback = std::function<void (int errorCode)>;
 
@@ -1890,7 +1819,7 @@ namespace ZEGO {
         /**
          * Callback for sending broadcast messages
          *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+         * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
          * @param messageID ID of this message
          */
         using ZegoIMSendBroadcastMessageCallback = std::function<void (int errorCode, unsigned long long messageID)>;
@@ -1899,7 +1828,7 @@ namespace ZEGO {
         /**
          * Callback for sending barrage message
          *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+         * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
          * @param messageID ID of this message
          */
         using ZegoIMSendBarrageMessageCallback = std::function<void (int errorCode, std::string messageID)>;
@@ -1908,7 +1837,7 @@ namespace ZEGO {
         /**
          * Callback for sending custom command
          *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+         * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
          */
         using ZegoIMSendCustomCommandCallback = std::function<void (int errorCode)>;
 
@@ -1916,7 +1845,7 @@ namespace ZEGO {
         /**
          * Callback for media player loads resources
          *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+         * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
          */
         using ZegoMediaPlayerLoadResourceCallback = std::function<void (int errorCode)>;
 
@@ -1924,25 +1853,9 @@ namespace ZEGO {
         /**
          * Callback for media player seek to playback progress
          *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+         * @param errorCode Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
          */
         using ZegoMediaPlayerSeekToCallback = std::function<void (int errorCode)>;
-
-
-        /**
-         * Callback for audio effect player loads resources
-         *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
-         */
-        using ZegoAudioEffectPlayerLoadResourceCallback = std::function<void (int errorCode)>;
-
-
-        /**
-         * Callback for audio effect player seek to playback progress
-         *
-         * @param errorCode Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
-         */
-        using ZegoAudioEffectPlayerSeekToCallback = std::function<void (int errorCode)>;
 
 
 

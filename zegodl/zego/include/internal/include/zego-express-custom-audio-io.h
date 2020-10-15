@@ -35,7 +35,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_enable_custom_audio_remote_processi
  * The callback to the corresponding setting of [setAudioDataHandler] is triggered when this interface is called and at publishing stream state or playing stream state.
  *
  * @param enable Whether to enable audio data callback
- * @param callback_bit_mask The callback api bitmask marker for receive audio data, refer to enum [ZegoAudioDataCallbackBitMask], when this param converted to binary, 0b01 that means 1 << 0 for triggering [onCapturedAudioData], 0x10 that means 1 << 1 for triggering [onPlaybackAudioData], 0x100 that means 1 << 2 for triggering [onMixedAudioData].The masks can be combined to allow different callbacks to be triggered simultaneously.
+ * @param callback_bit_mask The callback api bitmask marker for receive audio data, refer to enum [ZegoAudioDataCallbackBitMask], when this param converted to binary, 0x01 for triggering [onCapturedAudioData], 0x10 for triggering [onRemoteAudioData], 0x100 for triggering [onMixedAudioData].The masks can be combined to allow different callbacks to be triggered simultaneously.
  * @param param param of audio frame
  */
 ZEGOEXP_API zego_error EXP_CALL zego_express_enable_audio_data_callback(bool enable, unsigned int callback_bit_mask, struct zego_audio_frame_param param);
@@ -120,7 +120,7 @@ ZEGOEXP_API void EXP_CALL zego_register_process_remote_audio_data_callback(zego_
  * The callback for obtaining the audio data captured by the local microphone.
  *
  * In non-custom audio capture mode, the SDK capture the microphone's sound, but the developer may also need to get a copy of the The audio data captured by the SDK SDK is available through this callback.
- * On the premise of calling [setAudioDataHandler] to set the listener callback, after calling [enableAudioDataCallback] to set the mask 0b01 that means 1 << 0, this callback will be triggered only when it is in the publishing stream state.
+ * On the premise of calling [setAudioDataHandler] to set the listener callback, after calling [enableAudioDataCallback] to set the mask 0x01, this callback will be triggered only when it is in the publishing stream state.
  *
  * @param data audio data of pcm format
  * @param data_length length of data
@@ -136,9 +136,8 @@ ZEGOEXP_API void EXP_CALL zego_register_captured_audio_data_callback(zego_on_cap
  * The callback for obtaining the audio data of all the remote streams pulled.
  *
  * This method will callback all of the remote user's audio mix data. This callback can be used for that you needs to fetch all the playing streams to proccess.
- * On the premise of calling [setAudioDataHandler] to set the listener callback, after calling [enableAudioDataCallback] to set the mask 0b10 that means 1 << 1, this callback will be triggered only when it is in the playing stream state.
+ * On the premise of calling [setAudioDataHandler] to set the listener callback, after calling [enableAudioDataCallback] to set the mask 0x02, this callback will be triggered only when it is in the playing stream state.
  *
- * @deprecated This interface is deprecated, please use the [onPlaybackAudioData] interface
  * @param data audio data of pcm format
  * @param data_length length of data
  * @param param param of audio frame
@@ -147,23 +146,6 @@ ZEGOEXP_API void EXP_CALL zego_register_captured_audio_data_callback(zego_on_cap
 typedef void(*zego_on_remote_audio_data)(const unsigned char* data, unsigned int data_length, struct zego_audio_frame_param param, void * user_context);
 
 ZEGOEXP_API void EXP_CALL zego_register_remote_audio_data_callback(zego_on_remote_audio_data callback_func, void * user_context);
-
-
-/**
- * The callback for obtaining the audio data of all the streams playback by SDK.
- *
- * This method will callback all the mixed audio data to be playback. This callback can be used for that you needs to fetch all the mixed audio data to be playback to proccess.
- * On the premise of calling [setAudioDataHandler] to set the listener callback, after calling [enableAudioDataCallback] to set the mask 0b100 that means 1 << 2, this callback will be triggered only when it is in the SDK inner audio and video engine started(called the [startPreivew] or [startPlayingStream] or [startPublishingStream]).
- * When the engine is started in the non-playing stream state or the media player is not used to play the media file, the audio data to be called back is muted audio data.
- *
- * @param data audio data of pcm format
- * @param data_length length of data
- * @param param param of audio frame
- * @param user_context Context of user.
- */
-typedef void(*zego_on_playback_audio_data)(const unsigned char* data, unsigned int data_length, struct zego_audio_frame_param param, void * user_context);
-
-ZEGOEXP_API void EXP_CALL zego_register_playback_audio_data_callback(zego_on_playback_audio_data callback_func, void * user_context);
 
 
 /**

@@ -41,6 +41,8 @@ public:
 	virtual int disableVideo(LPVOID lpExtInfo, string &strOutput);
 	virtual int videoDrawing(LPVOID lpExtInfo, string &strOutput);
 
+	virtual int stopPlayingStream();
+
 public:
 	void createZegoEngine();
 	int initialize(string &strOutput);
@@ -55,6 +57,10 @@ public:
 
 	void onRoomStreamUpdate(const std::string &roomID, ZegoUpdateType updateType, const std::vector<ZegoStream> &streamList);
 
+	void enableCustomVideoCapture();
+	void startCapMedia(string path);
+
+	void enableCustomAudioIO();
 
 	IZegoExpressEngine* getEngine();
 protected:
@@ -66,9 +72,12 @@ private:
 
 	std::shared_ptr<CZegoEventHandler> m_pgEventHandler;
 	std::shared_ptr<CZegoCustomVideoRenderer> m_pgVideoRenderer;
+	std::shared_ptr<CustomVideoCapturer> m_pgVideoCap;
+
 
 	std::string  m_roomId;
 	std::string  m_localUserID;
 	std::vector<ZegoStream> m_zegoStreamList;
+	bool m_bstopPlayingStream = false;
 };
 

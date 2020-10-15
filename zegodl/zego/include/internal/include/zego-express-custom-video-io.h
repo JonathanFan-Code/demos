@@ -133,21 +133,6 @@ ZEGOEXP_API void EXP_CALL zego_register_custom_video_capture_stop_callback(zego_
 
 
 /**
- * SDK detects network changes and informs developers that it needs to do traffic control
- * In the case of custom video capture by sending encoded data, the SDK cannot know the external encoding configuration, so the traffic control operation needs to be completed by the developer.
- * The SDK will notify the developer of the recommended value of the video configuration according to the current network situation, and the developer needs to modify the encoder configuration by himself to ensure the smoothness of video transmission
- * Please do not perform time-consuming operations in this callback. If you need to perform time-consuming operations, please switch threads
- *
- * @param traffic_control_info traffic control info
- * @param channel Publishing stream channel
- * @param user_context Context of user.
- */
-typedef void(*zego_on_custom_video_capture_encoded_data_traffic_control)(struct zego_traffic_control_info traffic_control_info, enum zego_publish_channel channel, void * user_context);
-
-ZEGOEXP_API void EXP_CALL zego_register_custom_video_capture_encoded_data_traffic_control_callback(zego_on_custom_video_capture_encoded_data_traffic_control callback_func, void * user_context);
-
-
-/**
  * The callback for obtaining the locally captured video frames (Raw Data).
  *
  * @param data Raw data of video frames (eg: RGBA only needs to consider data[0], I420 needs to consider data[0,1,2])

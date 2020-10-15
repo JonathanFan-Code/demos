@@ -337,7 +337,6 @@ namespace ZEGO
                 _param.is_key_frame = param.isKeyFrame;
                 _param.height = param.height;
                 _param.width = param.width;
-                _param.rotation = param.rotation;
                 _param.sei_data = param.SEIData;
                 _param.sei_data_length = param.SEIDataLength;
                 return _param;
@@ -350,7 +349,6 @@ namespace ZEGO
                 param.isKeyFrame = _param.is_key_frame;
                 param.height = _param.height;
                 param.width = _param.width;
-                param.rotation = _param.rotation;
                 param.SEIData = _param.sei_data;
                 param.SEIDataLength = _param.sei_data_length;
                 return param;

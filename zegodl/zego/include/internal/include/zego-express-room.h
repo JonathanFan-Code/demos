@@ -54,24 +54,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_logout_room(const char * room_id);
 
 
 /**
- * Switch the room with advanced room configurations
- *
- * After successfully login room, if you need to quickly switch to the next room, you can call this API.
- * Calling this API is faster and easier to use than calling [logoutRoom] and then [loginRoom].
- * When this API is called, all streams currently publishing or playing will stop (but the local preview will not stop).
- * To prevent the app from being impersonated by a malicious user, you can add authentication before logging in to the room, that is, the [token] parameter in the ZegoRoomConfig object passed in by the [config] parameter. This parameter configuration affects the room to be switched over.
- *
- * @param from_room_id Current roomID
- * @param to_room_id The next roomID
- * @param config Advanced room configuration
- */
-ZEGOEXP_API zego_error EXP_CALL zego_express_switch_room(const char * from_room_id, const char * to_room_id, struct zego_room_config * config);
-
-
-/**
- * Set room extra information
- *
- * After the user in the room calls this api to set the extra info of the room, other users in the same room will be notified through the [onRoomExtraInfoUpdate] callback api
+ * Set room extra infomation
  *
  * @param room_id Room ID.
  * @param key key of the extra info.
@@ -81,21 +64,13 @@ ZEGOEXP_API zego_seq EXP_CALL zego_express_set_room_extra_info(const char * room
 
 
 /**
- * unknown
- *
- * @param room_id Room ID.
- * @param type Message type.
- * @param content Message content.
- * @param latest_seq Latest sequence.
+ * @deprecated This API is invalid in this SDK package and should not be used. If you need to use this API, please contact ZEGO technical support.
  */
 ZEGOEXP_API zego_error EXP_CALL zego_express_send_reliable_message(const char * room_id, const char * type, const char * content, unsigned int latest_seq);
 
 
 /**
- * unknown
- *
- * @param room_id Room ID.
- * @param type Message type.
+ * @deprecated This API is invalid in this SDK package and should not be used. If you need to use this API, please contact ZEGO technical support.
  */
 ZEGOEXP_API zego_error EXP_CALL zego_express_get_reliable_message(const char * room_id, const char * type);
 
@@ -107,7 +82,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_get_reliable_message(const char * r
  *
  * @param room_id Room ID, a string of up to 128 bytes in length.
  * @param state Changed room state
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the [common error code document](https://doc-en.zego.im/en/308.html) for details
  * @param extended_data Extended Information with state updates. As the standby, only an empty json table is currently returned
  * @param user_context context of user
  */
@@ -186,11 +161,7 @@ ZEGOEXP_API void EXP_CALL zego_register_room_stream_extra_info_update_callback(z
 
 
 /**
- * Callback of reception notification for reliable room information
- *
- * @param room_id Room ID.
- * @param message Zego reliable message
- * @param user_context context of user
+ * @deprecated This API is invalid in this SDK package and should not be used. If you need to use this API, please contact ZEGO technical support.
  */
 typedef void(*zego_on_room_recv_reliable_message)(const char * room_id, const struct zego_reliable_message* message, void * user_context);
 
@@ -198,12 +169,7 @@ ZEGOEXP_API void EXP_CALL zego_register_room_recv_reliable_message_callback(zego
 
 
 /**
- * Callback of reception notification update for reliable room information
- *
- * @param room_id Room ID.
- * @param msg_type Message type.
- * @param latest_seq Latest sequence.
- * @param user_context context of user
+ * @deprecated This API is invalid in this SDK package and should not be used. If you need to use this API, please contact ZEGO technical support.
  */
 typedef void(*zego_on_room_update_reliable_message_info)(const char * room_id, const char * msg_type, zego_seq latest_seq, void * user_context);
 
@@ -228,7 +194,7 @@ ZEGOEXP_API void EXP_CALL zego_register_room_extra_info_update_callback(zego_on_
 /**
  * Callback for setting room extra information
  *
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param room_id Room ID where the user is logged in, a string of up to 128 bytes in length.
  * @param key the key of the extra info
  * @param seq Message sequence.
@@ -243,7 +209,7 @@ ZEGOEXP_API void EXP_CALL zego_register_room_set_room_extra_info_result_callback
  * Callback of sending reliable message.
  *
  * @param room_id Room ID.
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param msg_type Message type.
  * @param send_seq Message sequence.
  * @param latest_seq Latest sequence.
@@ -257,7 +223,7 @@ ZEGOEXP_API void EXP_CALL zego_register_room_send_reliable_message_result_callba
 /**
  *
  * @param room_id Room ID.
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param send_seq Message sequence.
  * @param message Message content.
  * @param user_context Context of user.

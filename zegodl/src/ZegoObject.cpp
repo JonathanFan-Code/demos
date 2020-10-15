@@ -11,10 +11,13 @@ CZegoObject::CZegoObject(void)
 {
 	m_pgEventHandler = std::make_shared<CZegoEventHandler>();
 	m_pgVideoRenderer = std::make_shared<CZegoCustomVideoRenderer>();
+	m_pgVideoCap = std::make_shared<CustomVideoCapturer>();
 }
 
 CZegoObject::~CZegoObject(void)
 {
+	m_pgVideoCap->onStop(ZEGO_PUBLISH_CHANNEL_MAIN);
+    m_pgVideoCap = nullptr;
 }
 
 void CZegoObject::destroyZegoEngine()
@@ -254,7 +257,13 @@ int CZegoObject::setVideoConfig(LPVOID lpExtInfo, string &strOutput)
 
 int CZegoObject::logoutRoom()
 {
+	m_bstopPlayingStream = false;
 	m_lpZegoEngine->logoutRoom(m_roomId);
+	getEngine()->enableCustomVideoCapture(false, nullptr);
+    getEngine()->setCustomVideoCaptureHandler(nullptr);
+    getEngine()->setEventHandler(nullptr);
+	getEngine()->enableCustomAudioIO(false, nullptr);
+    getEngine()->setAudioDataHandler(nullptr);
 	m_zegoStreamList.clear();
 	return 0;
 }
@@ -281,6 +290,9 @@ void CZegoObject::onRoomStreamUpdate(const std::string &roomID, ZegoUpdateType u
 		}
 	}
 
+	if(m_bstopPlayingStream == true)
+		return;
+
 	CAGExtInfoManager *lpExtInfoManager = CAGExtInfoManager::GetAGExtInfoManager();
 
 	HWND hWnd = NULL;
@@ -296,6 +308,15 @@ void CZegoObject::onRoomStreamUpdate(const std::string &roomID, ZegoUpdateType u
 			nViewPos++;
 		}
 	}
+}
+
+int CZegoObject::stopPlayingStream()
+{
+	m_bstopPlayingStream = true;
+	for( auto stream:m_zegoStreamList) {
+		m_lpZegoEngine->stopPlayingStream(stream.streamID);
+	}
+	return 0;
 }
 
 int CZegoObject::disableAudio(LPVOID lpExtInfo, string &strOutput)
@@ -317,6 +338,31 @@ int CZegoObject::disableAudio(LPVOID lpExtInfo, string &strOutput)
 	m_lpZegoEngine->enableAudioCaptureDevice(!bMute);
 	m_lpZegoEngine->mutePublishStreamAudio(bMute);
 	return 0;
+}
+
+void CZegoObject::enableCustomVideoCapture()
+{
+	ZegoCustomVideoCaptureConfig captureConfig;
+	captureConfig.bufferType = ZEGO_VIDEO_BUFFER_TYPE_RAW_DATA;
+
+	getEngine()->enableCustomVideoCapture(true, &captureConfig);
+
+	getEngine()->setCustomVideoCaptureHandler(m_pgVideoCap);
+}
+
+void CZegoObject::enableCustomAudioIO()
+{
+	ZegoCustomAudioConfig audioConfig;
+	audioConfig.sourceType = ZEGO_AUDIO_SOURCE_TYPE_MEDIA_PLAYER;
+	getEngine()->enableCustomAudioIO(true, &audioConfig);
+}
+
+void CZegoObject::startCapMedia(string path)
+{
+	auto currentVideoSource = m_pgVideoCap->getVideoSource(ZegoCustomVideoSourceType_Media);
+    auto theMediaSource = (ZegoCustomVideoSourceMedia*)currentVideoSource;
+    theMediaSource->stopPlayMedia();
+    theMediaSource->startPlayMedia(path);
 }
 
 int CZegoObject::disableVideo(LPVOID lpExtInfo, string &strOutput)
@@ -367,3 +413,5 @@ int CZegoObject::videoDrawing(LPVOID lpExtInfo, string &strOutput)
 
 	return 0;
 }
+
+

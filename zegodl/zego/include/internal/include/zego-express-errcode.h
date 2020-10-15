@@ -2,21 +2,20 @@
 #ifndef __ZEGO_EXPRESS_ERRCODE_H__
 #define __ZEGO_EXPRESS_ERRCODE_H__
 
-#define ZEGO_EXPRESS_MODULE_COMMON                   (0)
-#define ZEGO_EXPRESS_MODULE_ENGINE                   (1)
-#define ZEGO_EXPRESS_MODULE_ROOM                     (2)
-#define ZEGO_EXPRESS_MODULE_PUBLISHER                (3)
-#define ZEGO_EXPRESS_MODULE_PLAYER                   (4)
-#define ZEGO_EXPRESS_MODULE_MIXER                    (5)
-#define ZEGO_EXPRESS_MODULE_DEVICE                   (6)
-#define ZEGO_EXPRESS_MODULE_PREPROCESS               (7)
-#define ZEGO_EXPRESS_MODULE_MEDIAPLAYER              (8)
-#define ZEGO_EXPRESS_MODULE_IM                       (9)
-#define ZEGO_EXPRESS_MODULE_RECORD                   (10)
-#define ZEGO_EXPRESS_MODULE_CUSTOMVIDEOIO            (11)
-#define ZEGO_EXPRESS_MODULE_CUSTOMAUDIOIO            (12)
-#define ZEGO_EXPRESS_MODULE_MEDIAPUBLISHER           (13)
-#define ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER        (14)
+#define ZEGO_EXPRESS_MODULE_COMMON         (0)
+#define ZEGO_EXPRESS_MODULE_ENGINE         (1)
+#define ZEGO_EXPRESS_MODULE_ROOM           (2)
+#define ZEGO_EXPRESS_MODULE_PUBLISHER      (3)
+#define ZEGO_EXPRESS_MODULE_PLAYER         (4)
+#define ZEGO_EXPRESS_MODULE_MIXER          (5)
+#define ZEGO_EXPRESS_MODULE_DEVICE         (6)
+#define ZEGO_EXPRESS_MODULE_PREPROCESS     (7)
+#define ZEGO_EXPRESS_MODULE_MEDIAPLAYER    (8)
+#define ZEGO_EXPRESS_MODULE_IM             (9)
+#define ZEGO_EXPRESS_MODULE_RECORD         (10)
+#define ZEGO_EXPRESS_MODULE_CUSTOMVIDEOIO  (11)
+#define ZEGO_EXPRESS_MODULE_CUSTOMAUDIOIO  (12)
+#define ZEGO_EXPRESS_MODULE_MEDIAPUBLISHER (13)
 
 /** Execution successful. */
 #define ZEGO_ERRCODE_COMMON_SUCCESS                                                         0
@@ -42,7 +41,7 @@
 /** This feature is not included in the SDK. Please contact ZEGO technical support. */
 #define ZEGO_ERRCODE_COMMON_SDK_NO_MODULE                                                   1000010
 
-/** The input stream ID is too long. The maximum length should be less than 256 bytes. */
+/** The input stream ID is too long. The maximum length allowed is 256 characters. */
 #define ZEGO_ERRCODE_COMMON_STREAM_ID_TOO_LONG                                              1000014
 
 /** The input stream ID is empty. */
@@ -75,7 +74,7 @@
 /** The length of the input AppSign must be 64 bytes. */
 #define ZEGO_ERRCODE_ENGINE_APPSIGN_INVALID_LENGTH                                          1001001
 
-/** The input AppSign contains invalid characters. Only '0'-'9', 'a'-'f', 'A'-'F' are valid. */
+/** The input AppSign contains invalid characters. Only '0'-'9','a'-'f','A'-'F' are valid. */
 #define ZEGO_ERRCODE_ENGINE_APPSIGN_INVALID_CHARACTER                                       1001002
 
 /** The input AppSign is empty. */
@@ -102,7 +101,7 @@
 /** The input user ID contains invalid characters. */
 #define ZEGO_ERRCODE_ROOM_USER_ID_INVALID_CHARACTER                                         1002006
 
-/** The input user ID is too long. The maximum length should be less than 64 bytes. */
+/** The input user ID is too long. The maximum length allowed is 64 characters. */
 #define ZEGO_ERRCODE_ROOM_USER_ID_TOO_LONG                                                  1002007
 
 /** The input user name is empty. */
@@ -111,7 +110,7 @@
 /** The input user name contains invalid characters. */
 #define ZEGO_ERRCODE_ROOM_USER_NAME_INVALID_CHARACTER                                       1002009
 
-/** The input user name is too long. The maximum length should be less than 256 bytes. */
+/** The input user name is too long. The maximum length allowed is 256 characters. */
 #define ZEGO_ERRCODE_ROOM_USER_NAME_TOO_LONG                                                1002010
 
 /** The input room ID is empty. */
@@ -120,16 +119,16 @@
 /** The input room ID contains invalid characters. */
 #define ZEGO_ERRCODE_ROOM_ROOMID_INVALID_CHARACTER                                          1002012
 
-/** The input room ID is too long. The maximum length should be less than 128 bytes. */
+/** The input room ID is too long. The maximum length allowed is 128 characters. */
 #define ZEGO_ERRCODE_ROOM_ROOMID_TOO_LONG                                                   1002013
 
 /** The key for room extra info is empty. */
 #define ZEGO_ERRCODE_ROOM_ROOM_EXTRA_INFO_KEY_EMPTY                                         1002014
 
-/** The key for room extra info is too long. The maximum length should be less than 128 bytes. */
+/** The key for room extra info is too long. The maximum length allowed is 128 characters. */
 #define ZEGO_ERRCODE_ROOM_ROOM_EXTRA_INFO_KEY_TOO_LONG                                      1002015
 
-/** The value for room extra info is too long. The maximum length should be less than 4096 bytes. */
+/** The value for room extra info is too long. The maximum length allowed is 4096 characters. */
 #define ZEGO_ERRCODE_ROOM_ROOM_EXTRA_INFO_VALUE_TOO_LONG                                    1002016
 
 /** The set key of the room extra info exceeds the maximum number supported. If you need to modify the number of setting keys, please contact ZEGO technical support. */
@@ -189,9 +188,6 @@
 /** Stream publishing is temporarily interrupted. Retrying... */
 #define ZEGO_ERRCODE_PUBLISHER_ERROR_NETWORK_INTERRUPT                                      1003020
 
-/** Stream publish retry has exceeds the maximum retry time. */
-#define ZEGO_ERRCODE_PUBLISHER_ERROR_RETRY_TIMEOUT                                          1003021
-
 /** Failed to publish the stream. The user is already publishing streams. */
 #define ZEGO_ERRCODE_PUBLISHER_ERROR_ALREADY_DO_PUBLISH                                     1003023
 
@@ -210,13 +206,13 @@
 /** Failed to send SEI. The SEI data is null. */
 #define ZEGO_ERRCODE_PUBLISHER_SEI_DATA_NULL                                                1003043
 
-/** Failed to send SEI because the SEI data is too long. The maximum length should be less than 4096 bytes. */
+/** Failed to send SEI because the SEI data is too long. The maximum length allowed is 4096 characters. */
 #define ZEGO_ERRCODE_PUBLISHER_SEI_DATA_TOO_LONG                                            1003044
 
 /** The extra info of the stream is null. */
 #define ZEGO_ERRCODE_PUBLISHER_EXTRA_INFO_NULL                                              1003050
 
-/** The extra info of the stream is too long. The maximum length should be less than 1024 bytes. */
+/** The extra info of the stream is too long. The maximum length allowed is 1024 characters. */
 #define ZEGO_ERRCODE_PUBLISHER_EXTRA_INFO_TOO_LONG                                          1003051
 
 /** Failed to update the extra info of the stream. Please check the network connection. */
@@ -225,7 +221,7 @@
 /** The watermark URL is null. */
 #define ZEGO_ERRCODE_PUBLISHER_WATERMARK_URL_NULL                                           1003055
 
-/** The watermark URL is too long. The maximum length should be less than 1024 bytes. */
+/** The watermark URL is too long. The maximum length allowed is 1024 characters. */
 #define ZEGO_ERRCODE_PUBLISHER_WATERMARK_URL_TOO_LONG                                       1003056
 
 /** Invalid watermark format. The supported formats are `jpg` and `png`. */
@@ -239,9 +235,6 @@
 
 /** Stream playing failed, possibly due to no data in the stream. */
 #define ZEGO_ERRCODE_PLAYER_PLAY_STREAM_FAILED                                              1004001
-
-/** Stream playing failed because the stream does not exist. Please check whether the remote end publish is indeed successful, or whether the publish and play environment are inconsistent */
-#define ZEGO_ERRCODE_PLAYER_PLAY_STREAM_NOT_EXIST                                           1004002
 
 /** The number of streams the user attempted to play simultaneously exceeds the maximum number allowed. Currently, up to 12 steams can be played at the same time. Please contact ZEGO technical support to increase the capacity if necessary. */
 #define ZEGO_ERRCODE_PLAYER_COUNT_EXCEED                                                    1004010
@@ -258,7 +251,7 @@
 /** The stream mixing task ID is null. */
 #define ZEGO_ERRCODE_MIXER_TASK_ID_NULL                                                     1005001
 
-/** The stream mixing task ID is too long. The maximum length should be less than 256 bytes. */
+/** The stream mixing task ID is too long. The maximum length allowed is 256 characters. */
 #define ZEGO_ERRCODE_MIXER_TASK_ID_TOO_LONG                                                 1005002
 
 /** The stream mixing task ID contains invalid characters. */
@@ -357,12 +350,6 @@
 /** The device list cannot be empty when trying to release devices. */
 #define ZEGO_ERRCODE_DEVICE_FREE_DEVICE_LIST_NULL                                           1006020
 
-/** The set sound level monitoring interval is out of range. */
-#define ZEGO_ERRCODE_DEVICE_SOULD_LEVEL_INTERVAL_INVALID                                    1006031
-
-/** The set audio spectrum monitoring interval is out of range. */
-#define ZEGO_ERRCODE_DEVICE_AUDIO_SPECTRUM_INTERVAL_INVALID                                 1006032
-
 /** Device internal error. */
 #define ZEGO_ERRCODE_DEVICE_INNER_ERROR                                                     1006099
 
@@ -432,7 +419,7 @@
 /** The input message content is empty. */
 #define ZEGO_ERRCODE_IM_CONTENT_NULL                                                        1009001
 
-/** The input message content is too long. The maximum length should be less than 1024 bytes. */
+/** The input message content is too long. The maximum length allowed is 1024 bytes. */
 #define ZEGO_ERRCODE_IM_CONTENT_TOO_LONG                                                    1009002
 
 /** Failed to send the message, possibly due to network problems. */
@@ -444,7 +431,7 @@
 /** Generic error of recording API, generally due to invalid input parameters. */
 #define ZEGO_ERRCODE_RECORD_COMMON_LIVEROOM_API_ERROR                                       1010003
 
-/** The specified recorded file path is too long. The maximum length should be less than 1024 bytes. */
+/** The specified recorded file path is too long. */
 #define ZEGO_ERRCODE_RECORD_FILE_PATH_TOO_LONG                                              1010011
 
 /** SDK internal VE error. Please contact ZEGO technical support to solve the problem. */
@@ -506,21 +493,6 @@
 
 /** Timestamp error (the later frame timestamp is smaller than the previous frame timestamp) */
 #define ZEGO_ERRCODE_MEDIAPUBLISHER_TIMESTAMP_GO_BACK_ERROR                                 1013004
-
-/** The AudioEffectPlayer instance is not created. */
-#define ZEGO_ERRCODE_AUDIOEFFECTPLAYER_NO_INSTANCE                                          1014000
-
-/** loadResource failed */
-#define ZEGO_ERRCODE_AUDIOEFFECTPLAYER_LOAD_FAILED                                          1014001
-
-/** play audio effect failed */
-#define ZEGO_ERRCODE_AUDIOEFFECTPLAYER_PLAY_FAILED                                          1014002
-
-/** seekTo failed */
-#define ZEGO_ERRCODE_AUDIOEFFECTPLAYER_SEEK_FAILED                                          1014003
-
-/** The number of AudioEffectPlayer instances exceeds the maximum number allowed. */
-#define ZEGO_ERRCODE_AUDIOEFFECTPLAYER_EXCEED_MAX_COUNT                                     1014004
 
 
 #endif /* __ZEGO_EXPRESS_ERRCODE_H__ */

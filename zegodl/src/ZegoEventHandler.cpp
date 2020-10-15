@@ -74,4 +74,47 @@ void CZegoEventHandler::onPlayerQualityUpdate(const std::string &streamID, const
 		<< " videoRecvBytes:" << quality.videoRecvBytes << std::endl;
 }
 
+void CustomVideoCapturer::onStart(ZegoPublishChannel channel)
+{
+    if (!mVideoCaptureRunning)
+    {
+        mVideoCaptureRunning = true;
+        mVideoCaptureThread = std::thread(std::bind(&CustomVideoCapturer::collectVideoFrameAndSendToEngine, this));
+    }
+}
 
+void CustomVideoCapturer::onStop(ZegoPublishChannel channel)
+{ 
+    if (mVideoCaptureRunning)
+    {
+        mVideoCaptureRunning = false;
+        mVideoCaptureThread.join();
+    }
+}
+
+void CustomVideoCapturer::collectVideoFrameAndSendToEngine()
+{
+    while (true)
+    {
+        if(!mVideoCaptureRunning){
+            break;
+        }
+
+        std::shared_ptr<ZegoCustomVideoFrame> videoFrame;
+        this->getVideoFrame(videoFrame);
+        if (videoFrame)
+        {
+            ZegoExpressSDK::getEngine()->sendCustomVideoCaptureRawData(videoFrame->data.get(), videoFrame->dataLength, videoFrame->param, videoFrame->referenceTimeMillsecond);
+        }
+
+		std::shared_ptr<ZegoCustomAudioFrame> audioFrame;
+        this->getAudioFrame(audioFrame);
+        if (audioFrame)
+        {
+            ZegoExpressSDK::getEngine()->sendCustomAudioCapturePCMData(audioFrame->data.get(), audioFrame->dataLength, 
+			audioFrame->param);
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+}

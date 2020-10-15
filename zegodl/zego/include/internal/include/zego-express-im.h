@@ -6,13 +6,13 @@
 
 ZEGO_BEGIN_DECLS
 /**
- * Sends a Broadcast Message
+ * Sends a Broadcast Message, which will be delivered to the first 500 users in the room.
  *
  * The total sending frequency limit of [sendBroadcastMessage] and [sendCustomCommand] is 600 times per minute by default.
- * Users of a certain number of advanced rooms in the same room can receive this callback. It is generally used when the number of people in the live room is less than a certain number. The specific number is determined by the configuration of the ZEGO server.
+ * Users of up to the first 500 advanced rooms in the same room can receive it, which is generally used when the number of live broadcast rooms is less than 500.
  *
  * @param room_id Room ID, a string of up to 128 bytes in length. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'
- * @param message Message content, no longer than 1024 bytes
+ * @param message Message content, no longer than 256 bytes
  */
 ZEGOEXP_API zego_seq EXP_CALL zego_express_send_broadcast_message(const char * room_id, const char * message);
 
@@ -21,10 +21,10 @@ ZEGOEXP_API zego_seq EXP_CALL zego_express_send_broadcast_message(const char * r
  * Sends a Barrage Message (bullet screen) to all users in the same room, without guaranteeing the delivery.
  *
  * There is no limit on the number of transmissions, but the server will actively drop messages if it is sent too frequently.
- * The api [sendBroadcastMessage] only supports that a certain number of users who entered the room can receive the sent message，but [sendBarrageMessage] can be received by users with more than the number of people in the same room, but it is not reliable, that is, when there are many users in the room or messages are sent frequently between users, the users who receive the messages may not be able to receive them. Generally used for sending live barrage.
+ * It can be received by users with more than 500 people in the same room, but it is not reliable, that is, when there are many users in the room or messages are sent frequently between users, the users who receive the messages may not be able to receive them. Generally used for sending live barrage.
  *
  * @param room_id Room ID, a string of up to 128 bytes in length. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'
- * @param message Message content, no longer than 1024 bytes
+ * @param message Message content, no longer than 256 bytes
  */
 ZEGOEXP_API zego_seq EXP_CALL zego_express_send_barrage_message(const char * room_id, const char * message);
 
@@ -36,7 +36,7 @@ ZEGOEXP_API zego_seq EXP_CALL zego_express_send_barrage_message(const char * roo
  * The type of point-to-point signaling in the same room is generally used for remote control signaling or message sending between users.
  *
  * @param room_id Room ID, a string of up to 128 bytes in length. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'
- * @param command Custom command content, no longer than 1024 bytes
+ * @param command Custom command content, no longer than 256 bytes
  * @param to_user_list The users who will receive the command
  * @return Sequence of message.
  */
@@ -87,7 +87,7 @@ ZEGOEXP_API void EXP_CALL zego_register_im_recv_custom_command_callback(zego_on_
  *
  * @param room_id Room ID.
  * @param message_id ID of this message
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param seq Sequence of sending broadcast message.
  * @param user_context Context of user.
  */
@@ -101,7 +101,7 @@ ZEGOEXP_API void EXP_CALL zego_register_im_send_broadcast_message_result_callbac
  *
  * @param room_id Room ID.
  * @param message_id ID of this message
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param seq Sequence of sending broadcast message.
  * @param user_context Context of user.
  */
@@ -114,7 +114,7 @@ ZEGOEXP_API void EXP_CALL zego_register_im_send_barrage_message_result_callback(
  * Callback for sending custom command
  *
  * @param room_id Room ID.
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param seq Sequence of sending broadcast message.
  * @param user_context Context of user.
  */

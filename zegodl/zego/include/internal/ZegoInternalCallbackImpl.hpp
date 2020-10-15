@@ -8,7 +8,6 @@
 #include "ZegoInternalBase.h"
 #include "ZegoInternalBridge.h"
 #include "ZegoInternalMediaPlayer.hpp"
-#include "ZegoInternalAudioEffectPlayer.hpp"
 
 namespace ZEGO
 {
@@ -29,9 +28,8 @@ namespace ZEGO
             declearMultiRawMember(ZegoMixerStartCallback);
             declearMultiRawMember(ZegoMixerStopCallback);
             declearMultiShareMember(ZegoExpressMediaPlayerImp);
-            declearMultiShareMember(ZegoExpressAudioEffectPlayerImp)
 #if ZEGO_EXPRESS_VIDEO_SDK
-                declearSingleShareMember(IZegoCustomVideoRenderHandler);
+            declearSingleShareMember(IZegoCustomVideoRenderHandler);
             declearSingleShareMember(IZegoCustomVideoCaptureHandler);
 #endif
             declearSingleShareMember(IZegoAudioDataHandler);
@@ -52,7 +50,6 @@ namespace ZEGO
                 mZegoMixerStartCallback.clear();
                 mZegoMixerStopCallback.clear();
                 mZegoExpressMediaPlayerImp.clear();
-                mZegoExpressAudioEffectPlayerImp.clear();
 #if ZEGO_EXPRESS_VIDEO_SDK
                 mIZegoCustomVideoRenderHandler = nullptr;
                 mIZegoCustomVideoCaptureHandler = nullptr;
@@ -134,10 +131,6 @@ namespace ZEGO
                 oInternalOriginBridge->registerMediaPlayerLoadFileResult(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_mediaplayer_load_file_result), ZegoVoidPtr(this));
                 oInternalOriginBridge->registerMediaPlayerAudioDataCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_media_player_audio_frame), ZegoVoidPtr(this));
 
-                oInternalOriginBridge->registerAudioEffectPlayStateUpdateCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_audio_effect_play_state_update), ZegoVoidPtr(this));
-                oInternalOriginBridge->registerAudioEffectPlayerLoadResourceCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_audio_effect_player_load_resource), ZegoVoidPtr(this));
-                oInternalOriginBridge->registerAudioEffectPlayerSeekToCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_audio_effect_player_seek_to), ZegoVoidPtr(this));
-
 #if ZEGO_EXPRESS_VIDEO_SDK
                 oInternalOriginBridge->registerMediaPlayerVideoDataCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_media_player_video_frame), ZegoVoidPtr(this));
 #endif
@@ -152,14 +145,12 @@ namespace ZEGO
 #if ZEGO_EXPRESS_VIDEO_SDK
                 oInternalOriginBridge->registerCustomVideoCaptureStartCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_custom_video_capture_start), ZegoVoidPtr(this));
                 oInternalOriginBridge->registerCustomVideoCaptureStopCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_custom_video_capture_stop), ZegoVoidPtr(this));
-                oInternalOriginBridge->registerCustomVideoCaptureEncodedDataTrafficControlCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_custom_video_capture_encoded_data_traffic_control), ZegoVoidPtr(this));
 #endif
 
                 oInternalOriginBridge->registerAudioMixingCopyDataCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_audio_mixing_copy_data), ZegoVoidPtr(this));
 
                 oInternalOriginBridge->registerOnCapturedAudioDataCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_captured_audio_data), ZegoVoidPtr(this));
                 oInternalOriginBridge->registerOnRemoteAudioDataCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_remote_audio_data), ZegoVoidPtr(this));
-                oInternalOriginBridge->registerOnPlaybackAudioDataCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_playback_audio_data), ZegoVoidPtr(this));
                 oInternalOriginBridge->registerOnMixedAudioDataCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_mixed_audio_data), ZegoVoidPtr(this));
 
                 oInternalOriginBridge->registerRecordingCapturedDataStateUpdateCallback(ZegoVoidPtr(&ZegoInternalCallbackCenter::zego_on_captured_data_record_state_update), ZegoVoidPtr(this));
@@ -231,10 +222,6 @@ namespace ZEGO
                 oInternalOriginBridge->registerMediaPlayerAudioDataCallback(nullptr, nullptr);
                 oInternalOriginBridge->registerMediaPlayerVideoDataCallback(nullptr, nullptr);
 
-                oInternalOriginBridge->registerAudioEffectPlayStateUpdateCallback(nullptr, nullptr);
-                oInternalOriginBridge->registerAudioEffectPlayerLoadResourceCallback(nullptr, nullptr);
-                oInternalOriginBridge->registerAudioEffectPlayerSeekToCallback(nullptr, nullptr);
-
                 oInternalOriginBridge->registerCustomVideoRenderLocalFrameDataCallback(nullptr, nullptr);
                 oInternalOriginBridge->registerCustomVideoRenderRemoteFrameDataCallback(nullptr, nullptr);
                 oInternalOriginBridge->registerCustomVideoRenderLocalFrameEncodedDataCallback(nullptr, nullptr);
@@ -242,13 +229,11 @@ namespace ZEGO
 
                 oInternalOriginBridge->registerCustomVideoCaptureStartCallback(nullptr, nullptr);
                 oInternalOriginBridge->registerCustomVideoCaptureStopCallback(nullptr, nullptr);
-                oInternalOriginBridge->registerCustomVideoCaptureEncodedDataTrafficControlCallback(nullptr, nullptr);
 
                 oInternalOriginBridge->registerAudioMixingCopyDataCallback(nullptr, nullptr);
 
                 oInternalOriginBridge->registerOnCapturedAudioDataCallback(nullptr, nullptr);
                 oInternalOriginBridge->registerOnRemoteAudioDataCallback(nullptr, nullptr);
-                oInternalOriginBridge->registerOnPlaybackAudioDataCallback(nullptr, nullptr);
                 oInternalOriginBridge->registerOnMixedAudioDataCallback(nullptr, nullptr);
 
                 oInternalOriginBridge->registerRecordingCapturedDataStateUpdateCallback(nullptr, nullptr);
@@ -1101,36 +1086,6 @@ namespace ZEGO
             }
 #endif
 
-            static void zego_on_audio_effect_play_state_update(unsigned int audio_effect_id, enum zego_audio_effect_play_state state, zego_error error_code, enum zego_audio_effect_player_instance_index instance_index, void *user_context)
-            {
-                ZEGO_UNUSED_VARIABLE(user_context);
-                auto audioEffectPlayer = oInternalCallbackCenter->getZegoExpressAudioEffectPlayerImp(instance_index);
-                if (audioEffectPlayer)
-                {
-                    audioEffectPlayer->zego_on_audio_effect_play_state_update(audio_effect_id, state, error_code);
-                }
-            }
-
-            static void zego_on_audio_effect_player_load_resource(zego_seq seq, zego_error error_code, enum zego_audio_effect_player_instance_index instance_index, void *user_context)
-            {
-                ZEGO_UNUSED_VARIABLE(user_context);
-                auto audioEffectPlayer = oInternalCallbackCenter->getZegoExpressAudioEffectPlayerImp(instance_index);
-                if (audioEffectPlayer)
-                {
-                    audioEffectPlayer->zego_on_audio_effect_player_load_resource(seq, error_code);
-                }
-            }
-
-            static void zego_on_audio_effect_player_seek_to(zego_seq seq, zego_error error_code, enum zego_audio_effect_player_instance_index instance_index, void *user_context)
-            {
-                ZEGO_UNUSED_VARIABLE(user_context);
-                auto audioEffectPlayer = oInternalCallbackCenter->getZegoExpressAudioEffectPlayerImp(instance_index);
-                if (audioEffectPlayer)
-                {
-                    audioEffectPlayer->zego_on_audio_effect_player_seek_to(seq, error_code);
-                }
-            }
-
             // CustomVideoRender
 #if ZEGO_EXPRESS_VIDEO_SDK
             static void zego_on_custom_video_render_captured_frame_data(unsigned char **data, unsigned int *data_length, const struct zego_video_frame_param _param, enum zego_video_flip_mode flip_mode, enum zego_publish_channel channel, void *user_context)
@@ -1215,25 +1170,6 @@ namespace ZEGO
             }
 #endif
 
-#if ZEGO_EXPRESS_VIDEO_SDK
-            static void zego_on_custom_video_capture_encoded_data_traffic_control(struct zego_traffic_control_info traffic_control_info, enum zego_publish_channel channel, void *user_context)
-            {
-                ZEGO_UNUSED_VARIABLE(user_context);
-                auto handler = oInternalCallbackCenter->getIZegoCustomVideoCaptureHandler();
-                auto weakHandler = std::weak_ptr<IZegoCustomVideoCaptureHandler>(handler);
-                ZegoTrafficControlInfo trafficControlInfo;
-                trafficControlInfo.bitrate = traffic_control_info.bitrate;
-                trafficControlInfo.fps = traffic_control_info.fps;
-                trafficControlInfo.height = traffic_control_info.height;
-                trafficControlInfo.width = traffic_control_info.width;
-                ZEGO_SWITCH_THREAD_PRE
-                auto handler = weakHandler.lock();
-                if (handler)
-                    handler->onEncodedDataTrafficControl(trafficControlInfo, ZegoPublishChannel(channel));
-                ZEGO_SWITCH_THREAD_ING
-            }
-#endif
-
             static void zego_on_audio_mixing_copy_data(struct zego_audio_mixing_data *data, void *user_context)
             {
                 ZEGO_UNUSED_VARIABLE(user_context);
@@ -1274,17 +1210,6 @@ namespace ZEGO
                 {
                     ZegoAudioFrameParam param = ZegoExpressConvert::I2OAudioFrameParam(_param);
                     handler->onRemoteAudioData(data, data_length, param);
-                }
-            }
-
-            static void zego_on_playback_audio_data(const unsigned char *data, unsigned int data_length, zego_audio_frame_param _param, void *user_context)
-            {
-                ZEGO_UNUSED_VARIABLE(user_context);
-                auto handler = oInternalCallbackCenter->getIZegoAudioDataHandler();
-                if (handler)
-                {
-                    ZegoAudioFrameParam param = ZegoExpressConvert::I2OAudioFrameParam(_param);
-                    handler->onPlaybackAudioData(data, data_length, param);
                 }
             }
 

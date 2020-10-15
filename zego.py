@@ -5,6 +5,19 @@ import json
 import sys
 import random
 
+channelName = "fantest"
+profile = {"bitrate": "600", "fps": "15", "resolution": "640*320"}
+
+isRobot = False
+
+enableCustomCapture = False
+customVideoSrc = "C:\\Users\\FJS\\Videos\\wudao.mp4"
+
+if isRobot == True:
+    enableCustomCapture = True
+
+enableHwenc = False
+enableHwdec = False
 
 try:
     current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -37,19 +50,35 @@ try:
     #zego.enumerateVideoDevices()
     #a = input()
     #zego.setRecordingDevice(ctypes.c_char_p(bytes("", 'utf-8')))
-    zego.setVideoDevice(ctypes.c_char_p(bytes("@device:sw:{860BB310-5D01-11D0-BD3B-00A0C911CE86}\yyanchorvcam", 'utf-8')))
+    #zego.setVideoDevice(ctypes.c_char_p(bytes("@device:sw:{860BB310-5D01-11D0-BD3B-00A0C911CE86}\yyanchorvcam", 'utf-8')))
 
-    profile = json.dumps({"bitrate": "600", "fps": "15", "resolution": "640*320"})
-    zego.setVideoProfile(ctypes.c_char_p(bytes(profile, 'utf-8')))
+    #开始视频自采集
+    if enableCustomCapture == True:
+        zego.enableCustomVideoCapture()
+        zego.enableCustomAudioIO()
+    
+
+    vprofile = json.dumps(profile)
+    zego.setVideoProfile(ctypes.c_char_p(bytes(vprofile, 'utf-8')))
 
     zego.enableVideo(ctypes.c_char_p(bytes("", 'utf-8')))
 
-    #zego.enableHardwareEncoder()
-    #zego.enableHardwareDecoder()
+    if enableHwenc == True:
+        zego.enableHardwareEncoder()
+    if enableHwdec == True:
+        zego.enableHardwareDecoder()
 
     uid = "fan"+str(random.randint(0,1000))
-    channel = json.dumps({"channelId":"test","uid":uid})
+    channel = json.dumps({"channelId":channelName,"uid":uid})
     zego.joinChannel(ctypes.c_char_p(bytes(channel, 'utf-8')))
+
+    if enableCustomCapture == True:
+        zego.startCapMedia(ctypes.c_char_p(bytes(customVideoSrc, 'utf-8')))
+
+    if isRobot == True:
+        zego.stopPreview()
+        zego.stopPlayingStream()
+        zego.muteSpeaker()
 
     window.mainloop()
 finally:

@@ -49,6 +49,15 @@ ZEGOEXP_API bool EXP_CALL zego_express_is_speaker_muted();
 
 
 /**
+ * Chooses to use the specified audio device.
+ *
+ * @param device_type Audio device type
+ * @param device_id ID of a device obtained by getAudioDeviceList
+ */
+ZEGOEXP_API zego_error EXP_CALL zego_express_use_audio_device(enum zego_audio_device_type device_type, const char * device_id);
+
+
+/**
  * Gets a list of audio devices.
  *
  * @param device_type Audio device type
@@ -64,37 +73,6 @@ ZEGOEXP_API struct zego_device_info *EXP_CALL zego_express_get_audio_device_list
  * @param device_list Audio device type
  */
 ZEGOEXP_API zego_error EXP_CALL zego_express_free_audio_device_list(struct zego_device_info* device_list);
-
-
-/**
- * Chooses to use the specified audio device.
- *
- * @param device_type Audio device type
- * @param device_id ID of a device obtained by getAudioDeviceList
- */
-ZEGOEXP_API zego_error EXP_CALL zego_express_use_audio_device(enum zego_audio_device_type device_type, const char * device_id);
-
-
-/**
- * Get volume for the specified audio device.
- *
- * @param device_type Audio device type
- * @param device_id ID of a device obtained by getAudioDeviceList
- * @return device volume
- */
-ZEGOEXP_API int EXP_CALL zego_express_get_audio_device_volume(enum zego_audio_device_type device_type, const char * device_id);
-
-
-/**
- * Set volume for the specified audio device.
- *
- * The direct operating system device may fail due to system restrictions. Please use setCaptureVolume and setPlayVolume first to adjust the volume of publish and play streams
- *
- * @param device_type Audio device type
- * @param device_id ID of a device obtained by getAudioDeviceList
- * @param volume device volume
- */
-ZEGOEXP_API zego_error EXP_CALL zego_express_set_audio_device_volume(enum zego_audio_device_type device_type, const char * device_id, int volume);
 
 
 /**
@@ -172,11 +150,9 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_free_video_device_list(struct zego_
  *
  * After starting monitoring, you can receive local audio sound level via [onCapturedSoundLevelUpdate] callback, and receive remote audio sound level via [onRemoteSoundLevelUpdate] callback.
  * Before entering the room, you can call [startPreview] with this api and combine it with [onCapturedSoundLevelUpdate] callback to determine whether the audio device is working properly.
- * [onCapturedSoundLevelUpdate] and [onRemoteSoundLevelUpdate] callback notification period is the value set by the parameter.
- *
- * @param millisecond Monitoring time period of the sound level, in milliseconds, has a value range of [100, 3000]. Default is 100 ms.
+ * [onCapturedSoundLevelUpdate] and [onRemoteSoundLevelUpdate] callback notification period is 100 ms.
  */
-ZEGOEXP_API zego_error EXP_CALL zego_express_start_sound_level_monitor(unsigned int millisecond);
+ZEGOEXP_API zego_error EXP_CALL zego_express_start_sound_level_monitor();
 
 
 /**
@@ -191,11 +167,9 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_stop_sound_level_monitor();
  * Starts audio spectrum monitoring.
  *
  * After starting monitoring, you can receive local audio spectrum via [onCapturedAudioSpectrumUpdate] callback, and receive remote audio spectrum via [onRemoteAudioSpectrumUpdate] callback.
- * [onCapturedAudioSpectrumUpdate] and [onRemoteAudioSpectrumUpdate] callback notification period is the value set by the parameter.
- *
- * @param millisecond Monitoring time period of the audio spectrum, in milliseconds, has a value range of [100, 3000]. Default is 100 ms.
+ * [onCapturedAudioSpectrumUpdate] and [onRemoteAudioSpectrumUpdate] callback notification period is 100 ms.
  */
-ZEGOEXP_API zego_error EXP_CALL zego_express_start_audio_spectrum_monitor(unsigned int millisecond);
+ZEGOEXP_API zego_error EXP_CALL zego_express_start_audio_spectrum_monitor();
 
 
 /**
@@ -324,7 +298,7 @@ ZEGOEXP_API void EXP_CALL zego_register_remote_audio_spectrum_update_callback(ze
  *
  * This callback is triggered when an exception occurs when reading or writing the audio and video device.
  *
- * @param error_code The error code corresponding to the status change of the playing stream. Please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code The error code corresponding to the status change of the playing stream. Please refer to the common error code documentation [https://doc-en.zego.im/en/308.html] for details
  * @param device_name device name
  * @param user_context Context of user.
  */

@@ -52,6 +52,43 @@ extern "C" void ZEGODL_API HelloWorld()
 	cout << "hello world" << endl;
 }
 
+extern "C" void ZEGODL_API enableCustomVideoCapture()
+{
+	cout << "enableCustomVideoCapture" << endl;
+	CZegoObject::GetZegoObject()->enableCustomVideoCapture();
+}
+
+extern "C" void ZEGODL_API enableCustomAudioIO()
+{
+	cout << "enableCustomAudioIO" << endl;
+	CZegoObject::GetZegoObject()->enableCustomAudioIO();
+}
+
+
+extern "C" void ZEGODL_API startCapMedia(LPVOID lpExtInfo)
+{
+	cout << "startCapMedia:" << lpExtInfo << endl;
+	CZegoObject::GetZegoObject()->startCapMedia((char*)lpExtInfo);
+}
+
+extern "C" void ZEGODL_API stopPreview()
+{
+	cout << "stopPreview:" << endl;
+	CZegoObject::GetZegoObject()->getEngine()->stopPreview(ZEGO::EXPRESS::ZEGO_PUBLISH_CHANNEL_MAIN);
+}
+
+extern "C" void ZEGODL_API stopPlayingStream()
+{
+	cout << "stopPlayingStream:" << endl;
+	CZegoObject::GetZegoObject()->stopPlayingStream();
+}
+
+extern "C" void ZEGODL_API muteSpeaker()
+{
+	cout << "muteSpeaker:" << endl;
+	CZegoObject::GetZegoObject()->getEngine()->muteSpeaker(true);
+}
+
 extern "C" void ZEGODL_API createEngine()
 {
 	cout << "createEngine" << endl;

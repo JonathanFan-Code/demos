@@ -7,7 +7,7 @@ import random
 
 app_id = "aab8b8f5a8cd4469a63042fcfafe7063"
 #app_id = "b0630af62ce84025bb358c8b62fa7a4e"
-channel_name = "fantest"
+channel_name = "fantest123"
 uid = random.randint(0,1000)
 
 try:
@@ -45,10 +45,10 @@ try:
 
     
     #agora.enumerateRecordingDevices()
-    agora.enumerateVideoDevices()
+    #agora.enumerateVideoDevices()
 
     #agora.setRecordingDevice(ctypes.c_char_p(bytes("", 'utf-8')))
-    agora.setVideoDevice(ctypes.c_char_p(bytes("YY开播", 'utf-8')))
+    #agora.setVideoDevice(ctypes.c_char_p(bytes("YY开播", 'utf-8')))
 
     #a = input()
 

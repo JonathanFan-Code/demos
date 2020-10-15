@@ -232,20 +232,6 @@ enum zego_audio_channel
 
 };
 
-/** Audio capture stereo mode */
-enum zego_audio_capture_stereo_mode
-{
-    /** Disable capture stereo, i.e. capture mono */
-    zego_audio_capture_stereo_mode_none = 0,
-
-    /** Always enable capture stereo */
-    zego_audio_capture_stereo_mode_always = 1,
-
-    /** Adaptive mode, capture stereo when publishing stream only, capture mono when publishing and playing stream (e.g. talk/intercom scenes) */
-    zego_audio_capture_stereo_mode_adaptive = 2
-
-};
-
 /** Audio Codec ID */
 enum zego_audio_codec_id
 {
@@ -697,23 +683,6 @@ enum zego_media_player_network_event
 
 };
 
-/** AudioEffectPlayer state */
-enum zego_audio_effect_play_state
-{
-    /** Not playing */
-    zego_audio_effect_play_state_no_play = 0,
-
-    /** Playing */
-    zego_audio_effect_play_state_playing = 1,
-
-    /** Pausing */
-    zego_audio_effect_play_state_pausing = 2,
-
-    /** End of play */
-    zego_audio_effect_play_state_play_ended = 3
-
-};
-
 /** volume type */
 enum zego_volume_type
 {
@@ -805,8 +774,8 @@ enum zego_audio_data_callback_bit_mask
     /** The mask bit of this field corresponds to the enable [onCapturedAudioData] callback interface */
     zego_audio_data_callback_bit_mask_captured = 1 << 0,
 
-    /** The mask bit of this field corresponds to the enable [onPlaybackAudioData] callback interface */
-    zego_audio_data_callback_bit_mask_playback = 1 << 1,
+    /** The mask bit of this field corresponds to the enable [onRemoteAudioData] callback interface */
+    zego_audio_data_callback_bit_mask_remote = 1 << 1,
 
     /** The mask bit of this field corresponds to the enable [onMixedAudioData] callback interface */
     zego_audio_data_callback_bit_mask_mixed = 1 << 2
@@ -850,17 +819,6 @@ enum zego_media_player_instance_index
 
     /** The forth mediaplayer instance index */
     zego_media_player_instance_index_forth = 3
-
-};
-
-/** AudioEffectPlayer instance index */
-enum zego_audio_effect_player_instance_index
-{
-    /** Unknown value */
-    zego_audio_effect_player_instance_index_null = -1,
-
-    /** The first AudioEffectPlayer instance index */
-    zego_audio_effect_player_instance_index_first = 0
 
 };
 
@@ -955,7 +913,7 @@ struct zego_custom_audio_config
  */
 struct zego_engine_config
 {
-    /** Log configuration, if not set, use the default configuration. It must be set before calling [createEngine] to take effect. If it is set after [createEngine], it will take effect at the next [createEngine] after [destroyEngine]. */
+    /** Log configuration, if not set, use the default configuration. It must be valid before [createEngine], if it is set after SDK initialization, it will take effect the next time [createEngine]. */
     struct zego_log_config* log_config;
 
 /** @deprecated This configuration is deprecated after 1.9.0. Please use the ZegoExpressEngine's [enableCustomVideoCapture] method instead */
@@ -967,7 +925,7 @@ struct zego_engine_config
 /** @deprecated This configuration is deprecated after 1.9.0. Please use the ZegoExpressEngine's [enableCustomVideoRender] method instead */
     struct zego_custom_video_render_config* custom_video_render_config;
 
-    /** Other special function switches, if not set, no special function will be used by default. Please contact ZEGO technical support before use. */
+    /** Other special function switches, if not set, no other special functions are used by default. Please contact ZEGO technical support before use. */
     char advanced_config[ZEGO_EXPRESS_MAX_COMMON_LEN];
 
 };
@@ -985,7 +943,7 @@ struct zego_room_config
     /** Whether to enable the user in and out of the room callback notification [onRoomUserUpdate], the default is off. If developers need to use ZEGO Room user notifications, make sure that each user who login sets this flag to true */
     bool is_user_status_notify;
 
-    /** The token issued by the developer's business server is used to ensure security. The generation rules are detailed in Room Login Authentication Description https://doc-en.zego.im/en/3881.html Default is empty string, that is, no authentication */
+    /** The token issued by the developer's business server is used to ensure security. The generation rules are detailed in [https://doc.zego.im/CN/565.html](https://doc.zego.im/CN/565.html). Default is empty string, that is, no authentication */
     char token[ZEGO_EXPRESS_MAX_COMMON_LEN];
 
 };
@@ -1018,25 +976,6 @@ struct zego_video_config
 
     /** The codec id to be used, the default value is [default]. Settings only take effect before publishing stream */
     enum zego_video_codec_id codec_id;
-
-};
-
-/**
- * Externally encoded data traffic control information
- */
-struct zego_traffic_control_info
-{
-    /** Video resolution width to be adjusted */
-    int width;
-
-    /** Video resolution height to be adjusted */
-    int height;
-
-    /** Video FPS to be adjusted */
-    int fps;
-
-    /** Video bitrate in kbps to be adjusted */
-    int bitrate;
 
 };
 
@@ -1088,7 +1027,7 @@ struct zego_stream
     /** User object instance */
     struct zego_user user;
 
-    /** Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'. */
+    /** Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'. */
     char stream_id[ZEGO_EXPRESS_MAX_STREAM_LEN];
 
     /** Stream extra info */
@@ -1396,7 +1335,7 @@ struct zego_mixer_video_config
  */
 struct zego_mixer_input
 {
-    /** Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'. */
+    /** Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'. */
     char stream_id[ZEGO_EXPRESS_MAX_STREAM_LEN];
 
     /** Mix stream content type */
@@ -1638,9 +1577,6 @@ struct zego_video_encoded_frame_param
     /** Whether it is a keyframe */
     bool is_key_frame;
 
-    /** Video frame rotation */
-    int rotation;
-
     /** Video frame width */
     int width;
 
@@ -1733,8 +1669,8 @@ struct zego_custom_audio_process_config
  */
 struct zego_data_record_config
 {
-    /** The path to save the recording file, absolute path, need to include the file name, the file name need to specify the suffix, currently only support .mp4 or .flv, if multiple recording for the same path, will overwrite the file with the same name. The maximum length should be less than 1024 bytes. */
-    char file_path[ZEGO_EXPRESS_MAX_URL_LEN];
+    /** The path to save the recording file, absolute path, need to include the file name, the file name need to specify the suffix, currently only support .mp4 or .flv, if multiple recording for the same path, will overwrite the file with the same name. */
+    char file_path[ZEGO_EXPRESS_MAX_COMMON_LEN];
 
     /** Type of recording media */
     enum zego_data_record_type record_type;
@@ -1751,19 +1687,6 @@ struct zego_data_record_progress
 
     /** Current recording file size in byte */
     unsigned long long current_file_size;
-
-};
-
-/**
- * AudioEffectPlayer play configuration
- */
-struct zego_audio_effect_play_config
-{
-    /** The number of play counts. When set to 0, it will play in an infinite loop until the user invoke [stop]. The default is 1, which means it will play only once. */
-    unsigned int play_count;
-
-    /** Whether to mix audio effects into the publishing stream, the default is false. */
-    bool is_publish_out;
 
 };
 

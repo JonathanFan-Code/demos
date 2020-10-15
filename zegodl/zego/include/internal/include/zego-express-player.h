@@ -14,7 +14,7 @@ ZEGO_BEGIN_DECLS
  * Playing the stream ID that does not exist, the SDK continues to try to play after executing this interface. After the stream ID is successfully published, the audio and video stream can be actually played.
  * The developer can update the player canvas by calling this interface again (the streamID must be the same).
  *
- * @param stream_id Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
+ * @param stream_id Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
  * @param canvas The view used to display the play audio and video stream's image. If the view is set to [NULL], it will not be displayed.
  */
 ZEGOEXP_API zego_error EXP_CALL zego_express_start_playing_stream(const char * stream_id, struct zego_canvas* canvas);
@@ -29,7 +29,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_start_playing_stream(const char * s
  * Playing the stream ID that does not exist, the SDK continues to try to play after executing this interface. After the stream ID is successfully published, the audio and video stream can be actually played.
  * The developer can update the player canvas by calling this interface again (the streamID must be the same).
  *
- * @param stream_id Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
+ * @param stream_id Stream ID, a string of up to 256 characters. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
  * @param canvas The view used to display the play audio and video stream's image. If the view is set to [NULL], it will not be displayed.
  * @param config Advanced player configuration
  */
@@ -108,7 +108,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_enable_check_poc(bool enable);
  *
  * @param stream_id stream ID
  * @param state Current play state
- * @param error_code The error code corresponding to the status change of the playing stream. Please refer to the Error Codes https://doc-en.zego.im/en/308.html for details.
+ * @param error_code The error code corresponding to the status change of the playing stream. Please refer to the common error code documentation [https://doc-en.zego.im/en/308.html] for details.
  * @param extended_data Extended Information with state updates. As the standby, only an empty json table is currently returned
  * @param user_context Context of user.
  */

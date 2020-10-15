@@ -14,24 +14,20 @@
 #include "./include/zego-express-im.h"
 #include "./include/zego-express-mixer.h"
 #include "./include/zego-express-mediaplayer.h"
-#include "./include/zego-express-audio-effect-player.h"
 #include "./include/zego-express-record.h"
 #include "./include/zego-express-custom-video-io.h"
 #include "./include/zego-express-custom-audio-io.h"
-#include "./ZegoInternalPrivate.h"
+#include "./include/zego-express-utils.h"
 
-namespace ZEGO
-{
-    namespace EXPRESS
-    {
 
-        class ZegoExpressEngineBridge
+namespace ZEGO {
+    namespace EXPRESS {
+
+        class  ZegoExpressEngineBridge
         {
-            class ZegoExpressEngineBridgePri
-            {
+            class ZegoExpressEngineBridgePri {
             public:
-                void init()
-                {
+                void init() {
                     this->debugVerboseLanguage = zego_language_english;
                     this->debugVerboseEnabled = true;
                     this->isTestEnv = false;
@@ -63,7 +59,7 @@ namespace ZEGO
                 zego_express_set_debug_verbose(enable, language);
             }
 
-            void setAndroidEnv(void *jvm, void *ctx)
+            void setAndroidEnv(void* jvm, void* ctx)
             {
                 zego_express_set_android_env(jvm, ctx);
             }
@@ -127,31 +123,25 @@ namespace ZEGO
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_ROOM, __FUNCTION__, result);
             }
 
-            void switchRoom(const char *from_room_id, const char *to_room_id, zego_room_config *room_config)
-            {
-                int result = zego_express_switch_room(from_room_id, to_room_id, room_config);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_ROOM, __FUNCTION__, result);
-            }
-
             int setRoomExtraInfo(const char *extraInfo, const char *key, const char *value)
             {
                 int seq = zego_express_set_room_extra_info(extraInfo, key, value);
                 return seq;
             }
 
-            void setVideoMirrorMode(zego_video_mirror_mode mirrorMode, zego_publish_channel channel)
+            void setVideoMirrorMode(zego_video_mirror_mode mirrorMode, enum zego_publish_channel channel)
             {
                 int result = zego_express_set_video_mirror_mode(mirrorMode, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
             }
 
-            void startPreview(zego_canvas *canvas, zego_publish_channel channel)
+            void startPreview(zego_canvas *canvas, enum zego_publish_channel channel)
             {
                 int result = zego_express_start_preview(canvas, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
             }
 
-            void stopPreview(zego_publish_channel channel)
+            void stopPreview(enum zego_publish_channel channel)
             {
                 int result = zego_express_stop_preview(channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
@@ -168,42 +158,42 @@ namespace ZEGO
                 return zego_express_get_audio_config();
             }
 
-            void setVideoConfig(zego_video_config videoConfig, zego_publish_channel channel)
+            void setVideoConfig(zego_video_config videoConfig, enum zego_publish_channel channel)
             {
                 int result = zego_express_set_video_config(videoConfig, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
             }
 
-            zego_video_config getVideoConfig(zego_publish_channel channel)
+            zego_video_config getVideoConfig(enum zego_publish_channel channel)
             {
                 return zego_express_get_video_config(channel);
             }
 
-            void startPublishingStream(const char *streamID, zego_publish_channel channel)
+            void startPublishingStream(const char *streamID, enum zego_publish_channel channel)
             {
                 int result = zego_express_start_publishing_stream(streamID, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
             }
 
-            void stopPublishingStream(zego_publish_channel channel)
+            void stopPublishingStream(enum zego_publish_channel channel)
             {
                 int result = zego_express_stop_publishing_stream(channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
             }
 
-            int setStreamExtraInfo(const char *extraInfo, zego_publish_channel channel)
+            int setStreamExtraInfo(const char *extraInfo, enum zego_publish_channel channel)
             {
                 int seq = zego_express_set_stream_extra_info(extraInfo, channel);
                 return seq;
             }
 
-            void mutePublishStreamAudio(bool mute, zego_publish_channel channel)
+            void mutePublishStreamAudio(bool mute, enum zego_publish_channel channel)
             {
                 int result = zego_express_mute_publish_stream_audio(mute, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
             }
 
-            void mutePublishStreamVideo(bool mute, zego_publish_channel channel)
+            void mutePublishStreamVideo(bool mute, enum zego_publish_channel channel)
             {
                 int result = zego_express_mute_publish_stream_video(mute, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
@@ -212,12 +202,6 @@ namespace ZEGO
             void setCaptureVolume(int volume)
             {
                 int result = zego_express_set_capture_volume(volume);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
-            }
-
-            void setAudioCaptureStereoMode(zego_audio_capture_stereo_mode mode)
-            {
-                int result = zego_express_set_audio_capture_stereo_mode(mode);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
             }
 
@@ -233,13 +217,13 @@ namespace ZEGO
                 return seq;
             }
 
-            void enablePublishDirectToCDN(bool enable, zego_cdn_config *config, zego_publish_channel channel)
+            void enablePublishDirectToCDN(bool enable, zego_cdn_config *config, enum zego_publish_channel channel)
             {
                 int result = zego_express_enable_publish_direct_to_cdn(enable, config, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
             }
 
-            void setPublishWatermark(zego_watermark *watermark, bool isPreviewVisible, zego_publish_channel channel)
+            void setPublishWatermark(zego_watermark *watermark, bool isPreviewVisible, enum zego_publish_channel channel)
             {
                 int result = zego_express_set_publish_watermark(isPreviewVisible, watermark, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
@@ -257,7 +241,7 @@ namespace ZEGO
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
             }
 
-            void sendSEI(const unsigned char *buffer, unsigned int buffer_length, zego_publish_channel channel)
+            void sendSEI(const unsigned char *buffer, unsigned int buffer_length, enum zego_publish_channel channel)
             {
                 int result = zego_express_send_sei(buffer, buffer_length, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
@@ -269,7 +253,7 @@ namespace ZEGO
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
             }
 
-            void setMinVideoBitrateForTrafficControl(int bitrate, zego_traffic_control_min_video_bitrate_mode mode)
+            void setMinVideoBitrateForTrafficControl(int bitrate, enum zego_traffic_control_min_video_bitrate_mode mode)
             {
                 int result = zego_express_set_min_video_bitrate_for_traffic_control(bitrate, mode);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PUBLISHER, __FUNCTION__, result);
@@ -359,7 +343,7 @@ namespace ZEGO
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_DEVICE, __FUNCTION__, result);
             }
 
-            void enableCamera(bool enable, zego_publish_channel channel)
+            void enableCamera(bool enable, enum zego_publish_channel channel)
             {
                 int result = zego_express_enable_camera(enable, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_DEVICE, __FUNCTION__, result);
@@ -371,9 +355,9 @@ namespace ZEGO
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_DEVICE, __FUNCTION__, result);
             }
 
-            void startSoundLevelMonitor(unsigned int millisecond)
+            void startSoundLevelMonitor()
             {
-                int result = zego_express_start_sound_level_monitor(millisecond);
+                int result = zego_express_start_sound_level_monitor();
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_DEVICE, __FUNCTION__, result);
             }
 
@@ -383,9 +367,9 @@ namespace ZEGO
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_DEVICE, __FUNCTION__, result);
             }
 
-            void startAudioSpectrumMonitor(unsigned int millisecond)
+            void startAudioSpectrumMonitor()
             {
-                int result = zego_express_start_audio_spectrum_monitor(millisecond);
+                int result = zego_express_start_audio_spectrum_monitor();
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_DEVICE, __FUNCTION__, result);
             }
 
@@ -419,18 +403,6 @@ namespace ZEGO
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_DEVICE, __FUNCTION__, result);
             }
 
-            int getAudioDeviceVolume(zego_audio_device_type deviceType, const char * deviceID)
-            {
-                int volume = zego_express_get_audio_device_volume(deviceType, deviceID);
-                return volume;
-            }
-
-            void setAudioDeviceVolume(zego_audio_device_type deviceType, const char *  deviceID, int volume)
-            {
-                int result = zego_express_set_audio_device_volume(deviceType, deviceID, volume);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_DEVICE, __FUNCTION__, result);
-            }
-
             zego_device_info *getAudioDeviceList(zego_audio_device_type device_type, int *device_count)
             {
                 zego_device_info *result = zego_express_get_audio_device_list(device_type, device_count);
@@ -443,7 +415,7 @@ namespace ZEGO
                 (void)result;
             }
 
-            void useVideoDevice(const char *deviceID, zego_publish_channel channel)
+            void useVideoDevice(const char *deviceID, enum zego_publish_channel channel)
             {
                 int result = zego_express_use_video_device(deviceID, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_DEVICE, __FUNCTION__, result);
@@ -515,13 +487,13 @@ namespace ZEGO
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PREPROCESS, __FUNCTION__, result);
             }
 
-            void enableBeautify(int feature, zego_publish_channel channel)
+            void enableBeautify(int feature, enum zego_publish_channel channel)
             {
                 int result = zego_express_enable_beautify(feature, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PREPROCESS, __FUNCTION__, result);
             }
 
-            void setBeautifyOption(zego_beautify_option option, zego_publish_channel channel)
+            void setBeautifyOption(zego_beautify_option option, enum zego_publish_channel channel)
             {
                 int result = zego_express_set_beautify_option(option, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_PREPROCESS, __FUNCTION__, result);
@@ -648,20 +620,6 @@ namespace ZEGO
                 return result;
             }
 
-            int mediaPlayerSetPlayVolume(int volume, zego_media_player_instance_index instance_index)
-            {
-                int result = zego_express_media_player_set_play_volume(volume, instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_MEDIAPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            int mediaPlayerSetPublishVolume(int volume, zego_media_player_instance_index instance_index)
-            {
-                int result = zego_express_media_player_set_publish_volume(volume, instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_MEDIAPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
             unsigned long long mediaPlayerGetTotalDuration(zego_media_player_instance_index instance_index)
             {
                 unsigned long long totalDuration = zego_express_media_player_get_total_duration(instance_index);
@@ -677,18 +635,6 @@ namespace ZEGO
             int mediaPlayerGetVolume(zego_media_player_instance_index instance_index)
             {
                 int volume = zego_express_media_player_get_volume(instance_index);
-                return volume;
-            }
-
-            int mediaPlayerGetPublishVolume(zego_media_player_instance_index instance_index)
-            {
-                int volume = zego_express_media_player_get_publish_volume(instance_index);
-                return volume;
-            }
-
-            int mediaPlayerGetPlayVolume(zego_media_player_instance_index instance_index)
-            {
-                int volume = zego_express_media_player_get_play_volume(instance_index);
                 return volume;
             }
 
@@ -747,133 +693,26 @@ namespace ZEGO
                 return result;
             }
 
-            zego_audio_effect_player_instance_index createAudioEffectPlayer()
-            {
-                zego_audio_effect_player_instance_index instanceIndex = zego_express_create_audio_effect_player();
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, instanceIndex == zego_audio_effect_player_instance_index_null ? ZEGO_ERRCODE_AUDIOEFFECTPLAYER_EXCEED_MAX_COUNT : ZEGO_ERRCODE_COMMON_SUCCESS);
-                return instanceIndex;
-            }
 
-            int destroyAudioEffectPlayer(zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_destroy_audio_effect_player(instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            int audioEffectPlayerLoadResource(unsigned int audio_effect_id, const char *path, zego_audio_effect_player_instance_index instance_index)
-            {
-                int seq = zego_express_audio_effect_player_load_resource(audio_effect_id, path, instance_index);
-                return seq;
-            }
-
-            int audioEffectPlayerUnloadResource(unsigned int audio_effect_id, zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_audio_effect_player_unload_resource(audio_effect_id, instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            int audioEffectPlayerStart(unsigned int audio_effect_id, const char *path, struct zego_audio_effect_play_config *config, zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_audio_effect_player_start(audio_effect_id, path, config, instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            };
-
-            int audioEffectPlayerStop(unsigned int audio_effect_id, zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_audio_effect_player_stop(audio_effect_id, instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            int audioEffectPlayerPause(unsigned int audio_effect_id, zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_audio_effect_player_pause(audio_effect_id, instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            int audioEffectPlayerResume(unsigned int audio_effect_id, zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_audio_effect_player_resume(audio_effect_id, instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            int audioEffectPlayerStopAll(zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_audio_effect_player_stop_all(instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            int audioEffectPlayerPauseAll(zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_audio_effect_player_pause_all(instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            int audioEffectPlayerResumeAll(zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_audio_effect_player_resume_all(instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            int audioEffectPlayerSeekTo(unsigned int audio_effect_id, unsigned long long millisecond, zego_audio_effect_player_instance_index instance_index)
-            {
-                int seq = zego_express_audio_effect_player_seek_to(audio_effect_id, millisecond, instance_index);
-                return seq;
-            }
-
-            int audioEffectPlayerSetVolume(unsigned int audio_effect_id, int volume, zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_audio_effect_player_set_volume(audio_effect_id, volume, instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            int audioEffectPlayerSetVolumeAll(int volume, zego_audio_effect_player_instance_index instance_index)
-            {
-                int result = zego_express_audio_effect_player_set_volume_all(volume, instance_index);
-                printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_AUDIOEFFECTPLAYER, __FUNCTION__, result);
-                return result;
-            }
-
-            unsigned long long audioEffectPlayerGetTotalDuration(unsigned int audio_effect_id, zego_audio_effect_player_instance_index instance_index)
-            {
-                unsigned long long result = zego_express_audio_effect_player_get_total_duration(audio_effect_id, instance_index);
-                return result;
-            }
-
-            unsigned long long audioEffectPlayerGetCurrentProgress(unsigned int audio_effect_id, zego_audio_effect_player_instance_index instance_index)
-            {
-                unsigned long long result = zego_express_audio_effect_player_get_current_progress(audio_effect_id, instance_index);
-                return result;
-            }
-
-            void enableCustomVideoRender(bool enable, struct zego_custom_video_render_config *config)
+            void enableCustomVideoRender(bool enable, struct zego_custom_video_render_config* config)
             {
                 int result = zego_express_enable_custom_video_render(enable, config);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_CUSTOMVIDEOIO, __FUNCTION__, result);
             }
 
-            void enableCustomVideoCapture(bool enable, zego_custom_video_capture_config *config, zego_publish_channel channel)
+            void enableCustomVideoCapture(bool enable, zego_custom_video_capture_config* config, zego_publish_channel channel)
             {
                 int result = zego_express_enable_custom_video_capture(enable, config, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_CUSTOMVIDEOIO, __FUNCTION__, result);
             }
 
-            void customVideoCaptureSetFillMode(zego_view_mode mode, zego_publish_channel channel)
+            void customVideoCaptureSetFillMode(zego_view_mode mode, enum zego_publish_channel channel)
             {
                 int result = zego_express_set_custom_video_capture_fill_mode(mode, channel);
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_CUSTOMVIDEOIO, __FUNCTION__, result);
             }
 
-            void customVideoCaptureSendRawData(const unsigned char *data, unsigned int data_length, const struct zego_video_frame_param param, unsigned long long reference_time_millisecond, zego_publish_channel channel)
+            void customVideoCaptureSendRawData(const unsigned char *data, unsigned int data_length, const struct zego_video_frame_param param, unsigned long long reference_time_millisecond, enum zego_publish_channel channel)
             {
                 int result = zego_express_send_custom_video_capture_raw_data(data, data_length, param, reference_time_millisecond, 1000, channel);
                 if (result != 0)
@@ -882,7 +721,7 @@ namespace ZEGO
                 }
             }
 
-            void customVideoCaptureSendEncodedFrameData(const unsigned char *data, unsigned int data_length, const struct zego_video_encoded_frame_param param, unsigned long long reference_time_millisecond, zego_publish_channel channel)
+            void customVideoCaptureSendEncodedFrameData(const unsigned char *data, unsigned int data_length, const struct zego_video_encoded_frame_param param, unsigned long long reference_time_millisecond, enum zego_publish_channel channel)
             {
                 int result = zego_express_send_custom_video_capture_encoded_data(data, data_length, param, double(reference_time_millisecond), channel);
                 if (result != 0)
@@ -927,7 +766,7 @@ namespace ZEGO
                 printDebugInfoAndPopupWhenError(ZEGO_EXPRESS_MODULE_RECORD, __FUNCTION__, result);
             }
 
-            void sendCustomAudioCaptureAACData(unsigned char *data, unsigned int dataLength, unsigned int configLength, unsigned long long referenceTimeMillisecond, zego_audio_frame_param param, zego_publish_channel channel)
+            void sendCustomAudioCaptureAACData(unsigned char * data, unsigned int dataLength, unsigned int configLength, unsigned long long referenceTimeMillisecond, zego_audio_frame_param param, zego_publish_channel channel)
             {
                 int result = zego_express_send_custom_audio_capture_aac_data(data, dataLength, configLength, referenceTimeMillisecond, param, channel);
                 if (result != 0)
@@ -936,7 +775,7 @@ namespace ZEGO
                 }
             }
 
-            void sendCustomAudioCapturePCMData(unsigned char *data, unsigned int dataLength, zego_audio_frame_param param, zego_publish_channel channel)
+            void sendCustomAudioCapturePCMData(unsigned char * data, unsigned int dataLength, zego_audio_frame_param param, zego_publish_channel channel)
             {
                 int result = zego_express_send_custom_audio_capture_pcm_data(data, dataLength, param, channel);
                 if (result != 0)
@@ -945,7 +784,7 @@ namespace ZEGO
                 }
             }
 
-            void fetchCustomAudioRenderPCMData(unsigned char *data, unsigned int dataLength, zego_audio_frame_param param)
+            void fetchCustomAudioRenderPCMData(unsigned char * data, unsigned int dataLength, zego_audio_frame_param param)
             {
                 int result = zego_express_fetch_custom_audio_render_pcm_data(data, dataLength, param);
                 if (result != 0)
@@ -969,20 +808,20 @@ namespace ZEGO
 
             void printDebugInfo(int module, const char *function_name, int error_code)
             {
+                auto detail = zego_express_get_print_debug_info(module, function_name, error_code);
                 if (pri->enableDebugErrorAlways || error_code != 0)
                 {
-                    auto detail = zego_express_get_print_debug_info(module, function_name, error_code);
                     zego_express_trigger_on_debug_error(error_code, function_name, detail);
                 }
             }
 
-            void postWindowsMessage(void *message)
+            void postWindowsMessage(void* message)
             {
                 zego_express_post_windows_message(message);
             }
 
             // eventHandler
-            void registerRecvWindowsMessageCallback(void *callback, void *user_context)
+            void registerRecvWindowsMessageCallback(void* callback, void* user_context)
             {
                 zego_register_recv_windows_message_callback(callback, user_context);
             }
@@ -992,7 +831,7 @@ namespace ZEGO
                 zego_register_engine_state_update_callback(zego_on_engine_state_update(callback_func), user_context);
             }
 
-            void registerEngineUninitCallback(void *callback_func, void *user_context)
+            void registerEngineUninitCallback(void* callback_func, void* user_context)
             {
                 zego_register_engine_uninit_callback(zego_on_engine_uninit(callback_func), user_context);
             }
@@ -1022,8 +861,7 @@ namespace ZEGO
                 zego_register_room_user_update_callback(zego_on_room_user_update(callback_func), user_context);
             }
 
-            void registerRoomOnlineUserCountUpdateCallback(void *callback_func, void *user_context)
-            {
+            void registerRoomOnlineUserCountUpdateCallback(void *callback_func, void* user_context){
                 zego_register_room_online_user_count_update_callback(zego_on_room_online_user_count_update(callback_func), user_context);
             }
 
@@ -1254,21 +1092,6 @@ namespace ZEGO
                 zego_register_media_player_video_frame_callback(zego_on_media_player_video_frame(callback_func), user_context);
             }
 
-            void registerAudioEffectPlayStateUpdateCallback(void *callback_func, void *user_context)
-            {
-                zego_register_audio_effect_play_state_update_callback(zego_on_audio_effect_play_state_update(callback_func), user_context);
-            }
-
-            void registerAudioEffectPlayerLoadResourceCallback(void *callback_func, void *user_context)
-            {
-                zego_register_audio_effect_player_load_resource_callback(zego_on_audio_effect_player_load_resource(callback_func), user_context);
-            }
-
-            void registerAudioEffectPlayerSeekToCallback(void *callback_func, void *user_context)
-            {
-                zego_register_audio_effect_player_seek_to_callback(zego_on_audio_effect_player_seek_to(callback_func), user_context);
-            }
-
             void registerCustomVideoRenderLocalFrameDataCallback(void *callback_func, void *user_context)
             {
                 zego_register_custom_video_render_captured_frame_data_callback(zego_on_custom_video_render_captured_frame_data(callback_func), user_context);
@@ -1299,55 +1122,44 @@ namespace ZEGO
                 zego_register_custom_video_capture_stop_callback(zego_on_custom_video_capture_stop(callback_func), user_context);
             }
 
-            void registerCustomVideoCaptureEncodedDataTrafficControlCallback(void *callback_func, void *user_context)
-            {
-                zego_register_custom_video_capture_encoded_data_traffic_control_callback(zego_on_custom_video_capture_encoded_data_traffic_control(callback_func), user_context);
-            }
-
-            void registerAudioMixingCopyDataCallback(void *callback_func, void *user_context)
+            void registerAudioMixingCopyDataCallback(void *callback_func, void* user_context)
             {
                 zego_register_copy_audio_mixing_data_callback(zego_on_copy_audio_mixing_data(callback_func), user_context);
             }
 
-            void registerOnCapturedAudioDataCallback(void *callback_func, void *user_context)
+            void registerOnCapturedAudioDataCallback(void *callback_func, void* user_context)
             {
                 zego_register_captured_audio_data_callback(zego_on_captured_audio_data(callback_func), user_context);
             }
 
-            // TODO registerOnRemoteAudioDataCallback -> registerOnPlaybackAudioDataCallback 需要废弃干掉 registerOnRemoteAudioDataCallback
-            void registerOnRemoteAudioDataCallback(void *callback_func, void *user_context)
+            void registerOnRemoteAudioDataCallback(void *callback_func, void* user_context)
             {
                 zego_register_remote_audio_data_callback(zego_on_remote_audio_data(callback_func), user_context);
             }
 
-            void registerOnPlaybackAudioDataCallback(void *callback_func, void *user_context)
-            {
-                zego_register_playback_audio_data_callback(zego_on_playback_audio_data(callback_func), user_context);
-            }
-
-            void registerOnMixedAudioDataCallback(void *callback_func, void *user_context)
+            void registerOnMixedAudioDataCallback(void *callback_func, void* user_context)
             {
                 zego_register_mixed_audio_data_callback(zego_on_mixed_audio_data(callback_func), user_context);
             }
 
-            void registerRecordingCapturedDataStateUpdateCallback(void *callback_func, void *user_context)
+            void registerRecordingCapturedDataStateUpdateCallback(void *callback_func, void* user_context)
             {
                 zego_register_captured_data_record_state_update_callback(zego_on_captured_data_record_state_update(callback_func), user_context);
             }
 
-            void registerRecordingCapturedDataProgressUpdateCallback(void *callback_func, void *user_context)
+            void registerRecordingCapturedDataProgressUpdateCallback(void *callback_func, void* user_context)
             {
                 zego_register_captured_data_record_progress_update_callback(zego_on_captured_data_record_progress_update(callback_func), user_context);
             }
 
-            void registerProcessCapturedAudioDataCallback(void *callback_func, void *user_context)
-            {
-                zego_register_process_captured_audio_data_callback(zego_on_process_captured_audio_data(callback_func), user_context);
-            }
-            void registerProcessRemoteAudioDataCallback(void *callback_func, void *user_context)
-            {
-                zego_register_process_remote_audio_data_callback(zego_on_process_remote_audio_data(callback_func), user_context);
-            }
+			void registerProcessCapturedAudioDataCallback(void *callback_func, void* user_context)
+			{
+				zego_register_process_captured_audio_data_callback(zego_on_process_captured_audio_data(callback_func), user_context);
+			}
+			void registerProcessRemoteAudioDataCallback(void *callback_func, void* user_context)
+			{
+				zego_register_process_remote_audio_data_callback(zego_on_process_remote_audio_data(callback_func), user_context);
+			}
 
         private:
             ZegoExpressEngineBridge()
@@ -1360,11 +1172,11 @@ namespace ZEGO
                 delete pri;
             }
 
-            ZegoExpressEngineBridgePri *pri = nullptr;
+            ZegoExpressEngineBridgePri* pri = nullptr;
         };
-#define oInternalOriginBridge ZegoExpressEngineBridge::GetInstance()
+        #define oInternalOriginBridge ZegoExpressEngineBridge::GetInstance()
 
-    } // namespace EXPRESS
-} // namespace ZEGO
+    }
+}
 
 #endif /* __ZEGOEXPRESSBRIDGE_H__ */

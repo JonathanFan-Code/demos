@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../zego/include/ZegoExpressSDK.h"
+#include "./ZegoCustomVideoSourceContext.h"
 using namespace ZEGO::EXPRESS;
 
 
@@ -44,5 +45,19 @@ public:
 		//dataInterface->onRemoteVideoFrameEncodedData(data, dataLength, param, referenceTimeMillisecond, streamID);
 		int i = 0;
 	}
+};
+
+class CustomVideoCapturer: public IZegoCustomVideoCaptureHandler, public ZegoCustomVideoSourceContext{
+
+public:
+    void onStart(ZegoPublishChannel channel) override;
+    void onStop(ZegoPublishChannel channel) override;
+
+private:
+    void collectVideoFrameAndSendToEngine();
+
+private:
+    std::atomic<bool> mVideoCaptureRunning = {false};
+    std::thread mVideoCaptureThread;
 };
 

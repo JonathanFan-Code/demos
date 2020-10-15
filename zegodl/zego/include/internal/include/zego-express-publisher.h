@@ -12,7 +12,7 @@ ZEGO_BEGIN_DECLS
  * Before you start to publish the stream, you need to join the room first by calling [loginRoom]. Other users in the same room can get the streamID by monitoring the [onRoomStreamUpdate] event callback after the local user publishing stream successfully.
  * In the case of poor network quality, user publish may be interrupted, and the SDK will attempt to reconnect. You can learn about the current state and error information of the stream published by monitoring the [onPublisherStateUpdate] event.
  *
- * @param stream_id Stream ID, a string of up to 256 characters, needs to be globally unique within the entire AppID. If in the same AppID, different users publish each stream and the stream ID is the same, which will cause the user to publish the stream failure. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
+ * @param stream_id Stream ID, a string of up to 256 characters, needs to be globally unique within the entire AppID. If in the same AppID, different users publish each stream and the stream ID is the same, which will cause the user to publish the stream failure. You cannot include URL keywords, otherwise publishing stream and playing stream will fails. Only support numbers, English characters and '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '=', '-', '`', ';', '’', ',', '.', '<', '>', '/', '\'.
  * @param channel Publish stream channel
  */
 ZEGOEXP_API zego_error EXP_CALL zego_express_start_publishing_stream(const char * stream_id, enum zego_publish_channel channel);
@@ -203,17 +203,6 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_set_capture_volume(int volume);
 
 
 /**
- * Set audio capture stereo mode
- *
- * This API is used to set the audio stereo capture mode. The default is mono, that is, dual channel collection is not enabled.
- * It needs to be invoked before [startPublishingStream], [startPlayingStream] or [startPreview] to take effect.
- *
- * @param mode Audio stereo capture mode
- */
-ZEGOEXP_API zego_error EXP_CALL zego_express_set_audio_capture_stereo_mode(enum zego_audio_capture_stereo_mode mode);
-
-
-/**
  * Adds a target CDN URL to which the stream will be relayed from ZEGO's cloud streaming server.
  *
  * You can call this api to publish the audio and video streams that have been published to the ZEGO real-time audio and video cloud to a custom CDN content distribution network that has high latency but supports high concurrent playing stream.
@@ -257,7 +246,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_enable_publish_direct_to_cdn(bool e
 /**
  * Sets up the stream watermark before stream publishing (for the specified channel).
  *
- * The layout of the watermark cannot exceed the video encoding resolution of the stream. It can be set at any time before or during the publishing stream.
+ * Set before publishing. The layout of the watermark cannot exceed the video encoding resolution of stream.
  *
  * @param is_preview_visible the watermark is visible on local preview
  * @param watermark The upper left corner of the watermark layout is the origin of the coordinate system, and the area cannot exceed the size set by the encoding resolution. If it is NULL, the watermark is cancelled.
@@ -315,7 +304,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_set_capture_pipeline_scale_mode(enu
  *
  * @param stream_id Stream ID
  * @param state Status of publishing stream
- * @param error_code The error code corresponding to the status change of the publish stream. Please refer to the Error Codes https://doc-en.zego.im/en/308.html for details.
+ * @param error_code The error code corresponding to the status change of the publish stream. Please refer to the common error code documentation [https://doc-en.zego.im/en/308.html] for details.
  * @param extended_data Extended information with state updates.
  * @param user_context Context of user.
  */
@@ -406,7 +395,7 @@ ZEGOEXP_API void EXP_CALL zego_register_publisher_relay_cdn_state_update_callbac
 /**
  * Callback for setting stream extra information
  *
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param seq Message sequence.
  * @param user_context Context of user.
  */
@@ -419,7 +408,7 @@ ZEGOEXP_API void EXP_CALL zego_register_publisher_update_stream_extra_info_resul
  * Callback for add/remove CDN URL
  *
  * @param stream_id Stream ID.
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param seq Message sequence.
  * @param user_context Context of user.
  */

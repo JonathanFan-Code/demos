@@ -158,7 +158,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_set_voice_changer_param(float param
 /**
  * Sets up the reverberation parameters.
  *
- * Different values set dynamically after a successful publishing will take effect, When all of the parameters is set to 0, the reverb is turned off.
+ * Different values set dynamically after a successful publishing will take effect, When any of the parameters is set to 0.0, the reverb is turned off.
  *
  * @param param Reverb parameter
  */
@@ -171,7 +171,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_set_reverb_param(struct zego_reverb
  * Note: You need to set up a dual channel setAudioConfig for the virtual stereo to take effect!
  *
  * @param enable true to turn on the virtual stereo, false to turn off the virtual stereo
- * @param angle angle of the sound source in the virtual stereo, ranging from 0 to 180, with 90 being the front, and 0 and 180 being respectively Corresponds to rightmost and leftmost, usually use 90.
+ * @param angle angle of the sound source in the virtual stereo, ranging from 0 to 180, with 90 being the front, and 0 and 180 being respectively Corresponds to rightmost and leftmost, usually defaults to 90.
  */
 ZEGOEXP_API zego_error EXP_CALL zego_express_enable_virtual_stereo(bool enable, int angle);
 

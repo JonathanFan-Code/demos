@@ -20,6 +20,11 @@ namespace ZEGO
             {
             }
 
+            int getIndex() override
+            {
+                return instanceIndex;
+            }
+
             void setEventHandler(std::shared_ptr<IZegoMediaPlayerEventHandler> handler) override
             {
                 std::lock_guard<std::mutex> lock(mediaEventMutex);
@@ -135,16 +140,6 @@ namespace ZEGO
                 oInternalOriginBridge->mediaPlayerSetVolume(volume, zego_media_player_instance_index(instanceIndex));
             }
 
-            void setPlayVolume(int volume) override
-            {
-                oInternalOriginBridge->mediaPlayerSetPlayVolume(volume, zego_media_player_instance_index(instanceIndex));
-            }
-
-            void setPublishVolume(int volume) override
-            {
-                oInternalOriginBridge->mediaPlayerSetPublishVolume(volume, zego_media_player_instance_index(instanceIndex));
-            }
-
             void setProgressInterval(unsigned long long millisecond) override
             {
                 oInternalOriginBridge->mediaPlayerSetProgressInterval(millisecond, zego_media_player_instance_index(instanceIndex));
@@ -165,25 +160,10 @@ namespace ZEGO
                 return oInternalOriginBridge->mediaPlayerGetVolume(zego_media_player_instance_index(instanceIndex));
             }
 
-            int getPlayVolume() override
-            {
-                return oInternalOriginBridge->mediaPlayerGetPlayVolume(zego_media_player_instance_index(instanceIndex));
-            }
-
-            int getPublishVolume() override
-            {
-                return oInternalOriginBridge->mediaPlayerGetPublishVolume(zego_media_player_instance_index(instanceIndex));
-            }
-
             ZegoMediaPlayerState getCurrentState() override
             {
                 zego_media_player_state state = oInternalOriginBridge->mediaPlayerGetCurrentState(zego_media_player_instance_index(instanceIndex));
                 return ZegoMediaPlayerState(state);
-            }
-
-            int getIndex() override
-            {
-                return instanceIndex;
             }
 
             void zego_on_media_player_state_update(zego_media_player_state state, zego_error error_code)

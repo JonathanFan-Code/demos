@@ -1,5 +1,5 @@
 ﻿//
-//  Version: 1.16.0.401_stable_video
+//  Version: 1.13.1.258_stable_video
 //
 //  Copyright © 2019 Zego. All rights reserved.
 //
@@ -24,7 +24,7 @@ namespace ZEGO {
              *
              * The engine needs to be created and initialized before calling other APIs. The SDK only supports the creation of one instance of ZegoExpressEngine. Multiple calls to this interface return the same object.
              *
-             * @param appID Application ID issued by ZEGO for developers, please apply from the ZEGO Admin Console https://console-express.zego.im The value ranges from 0 to 4294967295.
+             * @param appID Application ID issued by ZEGO for developers, please apply from the ZEGO Admin Console https://console-express.zego.im/. The value ranges from 0 to 4294967295.
              * @param appSign Application signature for each AppID, please apply from the ZEGO Admin Console. Application signature is a 64 character string. Each character has a range of '0' ~ '9', 'a' ~ 'z'.
              * @param isTestEnv Choose to use a test environment or a formal commercial environment, the formal environment needs to submit work order configuration in the ZEGO management console. The test environment is for test development, with a limit of 30 rooms and 230 users. Official environment App is officially launched. ZEGO will provide corresponding server resources according to the configuration records submitted by the developer in the management console. The test environment and the official environment are two sets of environments and cannot be interconnected.
              * @param scenario The application scenario. Developers can choose one of ZegoScenario based on the scenario of the app they are developing, and the engine will preset a more general setting for specific scenarios based on the set scenario. After setting specific scenarios, developers can still call specific api to set specific parameters if they have customized parameter settings.
@@ -59,9 +59,9 @@ namespace ZEGO {
             }
 
             /**
-             * Set advanced engine configuration
+             * Sets up the advanced engine configurations. This API will only take effect when called before [createEngine].
              *
-             * Developers need to call this API to set advanced function configuration when they need advanced functions of the engine.
+             * Developers need to call this interface to set advanced function configuration when they need advanced functions of the engine.
              *
              * @param config Advanced engine configuration
              */

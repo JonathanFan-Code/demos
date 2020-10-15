@@ -31,7 +31,7 @@ ZEGOEXP_API zego_error EXP_CALL zego_express_stop_recording_captured_data(enum z
  * The callback triggered when the state of data recording (to a file) changes.
  *
  * @param state File recording status, according to which you should determine the state of the file recording or the prompt of the UI.
- * @param error_code Error code, please refer to the Error Codes https://doc-en.zego.im/en/308.html for details
+ * @param error_code Error code, please refer to the common error code document [https://doc-en.zego.im/en/308.html] for details
  * @param config Record config
  * @param channel Publishing stream channel
  * @param user_context Context of user.

@@ -7,7 +7,6 @@
 #include "ZegoInternalBase.h"
 #include "ZegoInternalCallbackImpl.hpp"
 #include "ZegoInternalMediaPlayer.hpp"
-#include "ZegoInternalAudioEffectPlayer.hpp"
 
 namespace ZEGO
 {
@@ -72,21 +71,6 @@ namespace ZEGO
             {
                 const char *_roomId = roomID.c_str();
                 oInternalOriginBridge->logoutRoom(_roomId);
-            }
-
-            void switchRoom(const std::string& fromRoomID, const std::string& toRoomID, ZegoRoomConfig *config) override
-            {
-                const char *from_room_id = fromRoomID.c_str();
-                const char *to_room_id = toRoomID.c_str();
-                if (config == nullptr)
-                {
-                    oInternalOriginBridge->switchRoom(from_room_id, to_room_id, nullptr);
-                }
-                else
-                {
-                    zego_room_config _config = ZegoExpressConvert::O2IRoomConfig(*config);
-                    oInternalOriginBridge->switchRoom(from_room_id, to_room_id, &_config);
-                }
             }
 
             void setRoomExtraInfo(const std::string& roomID, const std::string& key, const std::string& value, ZegoRoomSetRoomExtraInfoCallback callback) override
@@ -250,11 +234,6 @@ namespace ZEGO
             void setCaptureVolume(int volume) override
             {
                 oInternalOriginBridge->setCaptureVolume(volume);
-            }
-
-            void setAudioCaptureStereoMode(ZegoAudioCaptureStereoMode mode) override
-            {
-                oInternalOriginBridge->setAudioCaptureStereoMode(zego_audio_capture_stereo_mode(mode));
             }
 
             void addPublishCdnUrl(const std::string &streamID, const std::string &targetURL, ZegoPublisherUpdateCdnUrlCallback callback) override
@@ -471,19 +450,18 @@ namespace ZEGO
                 oInternalOriginBridge->enableAudioCaptureDevice(enable);
             }
 
-            void startSoundLevelMonitor(unsigned int millisecond) override
+            void startSoundLevelMonitor() override
             {
-                oInternalOriginBridge->startSoundLevelMonitor(millisecond);
+                oInternalOriginBridge->startSoundLevelMonitor();
             }
 
             void stopSoundLevelMonitor() override
             {
                 oInternalOriginBridge->stopSoundLevelMonitor();
             }
-            
-            void startAudioSpectrumMonitor(unsigned int millisecond) override
+            void startAudioSpectrumMonitor() override
             {
-                oInternalOriginBridge->startAudioSpectrumMonitor(millisecond);
+                oInternalOriginBridge->startAudioSpectrumMonitor();
             }
 
             void stopAudioSpectrumMonitor() override
@@ -510,18 +488,6 @@ namespace ZEGO
             {
                 const char *device_id = deviceID.c_str();
                 oInternalOriginBridge->useAudioDevice(zego_audio_device_type(deviceType), device_id);
-            }
-
-            int getAudioDeviceVolume(ZegoAudioDeviceType deviceType, const std::string& deviceID) override
-            {
-                const char *device_id = deviceID.c_str();
-                return oInternalOriginBridge->getAudioDeviceVolume(zego_audio_device_type(deviceType), device_id);
-            }
-
-            void setAudioDeviceVolume(ZegoAudioDeviceType deviceType, const std::string& deviceID, int volume) override
-            {
-                const char *device_id = deviceID.c_str();
-                oInternalOriginBridge->setAudioDeviceVolume(zego_audio_device_type(deviceType), device_id, volume);
             }
 
             std::vector<ZegoDeviceInfo> getAudioDeviceList(ZegoAudioDeviceType deviceType) override
@@ -758,28 +724,6 @@ namespace ZEGO
                 if(mediaPlayer && oInternalCallbackCenter->getZegoExpressMediaPlayerImp(mediaPlayer->getIndex())){
                     oInternalOriginBridge->destroyMediaPlayer(zego_media_player_instance_index(mediaPlayer->getIndex()));
                     oInternalCallbackCenter->eraseZegoExpressMediaPlayerImp(mediaPlayer->getIndex());
-                }
-            }
-
-            //===================================================================================================
-            IZegoAudioEffectPlayer *createAudioEffectPlayer() override
-            {
-                auto index = oInternalOriginBridge->createAudioEffectPlayer();
-                if (index == zego_audio_effect_player_instance_index_null)
-                {
-                    return nullptr;
-                }
-
-                auto audioEffectPlayer = std::make_shared<ZegoExpressAudioEffectPlayerImp>(index);
-                oInternalCallbackCenter->insertZegoExpressAudioEffectPlayerImp(index, audioEffectPlayer);
-                return audioEffectPlayer.get();
-            }
-
-            void destroyAudioEffectPlayer(IZegoAudioEffectPlayer *&audioEffectPlayer) override
-            {
-                if(audioEffectPlayer && oInternalCallbackCenter->getZegoExpressAudioEffectPlayerImp(audioEffectPlayer->getIndex())){
-                    oInternalOriginBridge->destroyAudioEffectPlayer(zego_audio_effect_player_instance_index(audioEffectPlayer->getIndex()));
-                    oInternalCallbackCenter->eraseZegoExpressAudioEffectPlayerImp(audioEffectPlayer->getIndex());
                 }
             }
 
