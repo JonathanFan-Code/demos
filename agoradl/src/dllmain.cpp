@@ -116,6 +116,14 @@ extern "C" void AGORADL_API enableAudio(LPVOID lpExtInfo)
 	
 }
 
+extern "C" void AGORADL_API setParameters(LPVOID lpExtInfo)
+{
+	std::cout<<"setParameters:"<<(char*)lpExtInfo<<endl;
+	AParameter msp(CAgoraObject::GetAgoraObject(nullptr)->GetEngine());
+	msp->setParameters((char*)lpExtInfo);
+}
+
+
 extern "C" void AGORADL_API setVideoProfile(LPVOID lpExtInfo)
 {
 	Json::Value root;

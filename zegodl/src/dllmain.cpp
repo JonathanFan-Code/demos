@@ -192,5 +192,20 @@ extern "C" void ZEGODL_API enableHardwareDecoder()
 	CZegoObject::GetZegoObject()->getEngine()->enableHardwareDecoder(true);
 }
 
+extern "C" void ZEGODL_API disableAEC()
+{
+	CZegoObject::GetZegoObject()->getEngine()->enableAEC(false);
+}
+
+extern "C" void ZEGODL_API disableANS()
+{
+	CZegoObject::GetZegoObject()->getEngine()->enableANS(false);
+}
+
+extern "C" void ZEGODL_API disableeAGC()
+{
+	CZegoObject::GetZegoObject()->getEngine()->enableAGC(false);
+}
+
 
 
