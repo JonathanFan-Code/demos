@@ -16,6 +16,8 @@ disableVideo = False
 #disableAudio does not work for zego
 disableAudio = False
 
+disable3A = False
+
 enableCustomCapture = False
 customVideoSrc = "C:\\Users\\FJS\\Videos\\wudao.mp4"
 
@@ -74,6 +76,11 @@ try:
         zego.enableHardwareEncoder()
     if enableHwdec == True:
         zego.enableHardwareDecoder()
+
+    if disable3A == True:
+        zego.disableAEC()
+        zego.disableANS()
+        zego.disableeAGC()
 
     uid = "fan"+str(random.randint(0,1000))
     channel = json.dumps({"channelId":channelName,"uid":uid})

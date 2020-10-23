@@ -10,6 +10,10 @@ app_id = "aab8b8f5a8cd4469a63042fcfafe7063"
 channel_name = "fantest123"
 uid = random.randint(0,1000)
 
+disableVideo = False
+disableAudio = False
+disable3A = False
+
 try:
     current_dir = os.path.abspath(os.path.dirname(__file__))
     current_dir = os.path.join(current_dir,"agoradl/bin")
@@ -38,9 +42,13 @@ try:
     agora.createEngine(ctypes.c_char_p(bytes(app_id, 'utf-8')))
   
     enableAudio = json.dumps({"enable": "true"})
+    if disableAudio == True:
+        enableAudio = json.dumps({"enable": "false"})
     agora.enableAudio(ctypes.c_char_p(bytes(enableAudio, 'utf-8')))
     
     enableVideo = json.dumps({"enable": "true"})
+    if disableVideo == True:
+        enableVideo = json.dumps({"enable": "false"})
     agora.enableVideo(ctypes.c_char_p(bytes(enableVideo, 'utf-8')))
 
     
@@ -50,8 +58,6 @@ try:
     #agora.setRecordingDevice(ctypes.c_char_p(bytes("", 'utf-8')))
     #agora.setVideoDevice(ctypes.c_char_p(bytes("YY开播", 'utf-8')))
 
-    #a = input()
-
     channelProfile = json.dumps({"channelprofile": "1"})
     agora.setChannelProfile(ctypes.c_char_p(bytes(channelProfile,'utf-8')))
 
@@ -60,6 +66,10 @@ try:
 
     profile = json.dumps({"bitrate": "600", "fps": "15", "resolution": "640*320"})
     agora.setVideoProfile(ctypes.c_char_p(bytes(profile, 'utf-8')))
+    
+    if disable3A == True:
+        parameter = '{"che.audio.bypass.apm" : true}'
+        agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
 
     channel = json.dumps({"channelId":channel_name,"uid":str(uid)})
     agora.joinChannel(ctypes.c_char_p(bytes(channel, 'utf-8')))
