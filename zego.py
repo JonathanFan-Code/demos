@@ -100,6 +100,7 @@ try:
         zego.stopPreview()
         zego.stopPlayingStream()
         zego.muteSpeaker()
+        zego.muteMicrophone()
 
     window.mainloop()
 finally:

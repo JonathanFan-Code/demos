@@ -207,5 +207,10 @@ extern "C" void ZEGODL_API disableeAGC()
 	CZegoObject::GetZegoObject()->getEngine()->enableAGC(false);
 }
 
+extern "C" void ZEGODL_API muteMicrophone()
+{
+	CZegoObject::GetZegoObject()->getEngine()->muteMicrophone(true);
+}
+
 
 
