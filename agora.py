@@ -7,7 +7,7 @@ import random
 
 app_id = "aab8b8f5a8cd4469a63042fcfafe7063"
 #app_id = "b0630af62ce84025bb358c8b62fa7a4e"
-channel_name = "fantest123"
+channel_name = "test"
 uid = random.randint(0,1000)
 
 disableVideo = False

@@ -7,7 +7,7 @@ import random
 import time
 
 
-channelName = "fantest"
+channelName = "test"
 profile = {"bitrate": "600", "fps": "15", "resolution": "640*320"}
 
 isRobot = False
