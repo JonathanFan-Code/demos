@@ -661,6 +661,25 @@ void CAGEngineEventHandler::onRemoteVideoStats(const RemoteVideoStats& stats)
 	::PostMessage(m_hMainWnd, WM_MSGID(EID_REMOTE_VIDEO_STAT), (WPARAM)lpData, 0);
 }
 
+
+void CAGEngineEventHandler::onLocalAudioStats(const LocalAudioStats& stats)
+{
+    std::cout << "agora onLocalAudioStats numChannels:" << stats.numChannels << " sentSampleRate:" << stats.sentSampleRate 
+        << " sentBitrate:" << stats.sentBitrate << " txPacketLossRate:" << stats.txPacketLossRate 
+		<< std::endl;
+}
+
+void CAGEngineEventHandler::onRemoteAudioStats(const RemoteAudioStats& stats)
+{
+    std::cout << "agora onRemoteAudioStats uid:" << stats.uid << " quality:" << stats.quality 
+        << " networkTransportDelay:" << stats.networkTransportDelay << " jitterBufferDelay:" << stats.jitterBufferDelay
+        << " audioLossRate:" << stats.audioLossRate << " numChannels:" << stats.numChannels  
+        << " receivedSampleRate:" << stats.receivedSampleRate << " receivedBitrate:" << stats.receivedBitrate
+        << " totalFrozenTime:" << stats.totalFrozenTime << " frozenRate:" << stats.frozenRate  
+        << " totalActiveTime:" << stats.totalActiveTime << " publishDuration:" << stats.publishDuration
+		<< std::endl;
+}
+
 /**
 DEPRECATED Occurs when the camera turns on and is ready to capture the video.
 

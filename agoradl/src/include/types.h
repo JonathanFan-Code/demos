@@ -3,4 +3,5 @@
 
 #define AHANDLE void*
 #define AGORADL_EXPORTS
+typedef unsigned char BYTE;
 #endif

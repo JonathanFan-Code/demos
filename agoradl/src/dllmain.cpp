@@ -1,6 +1,6 @@
 ﻿// dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "types.h"
-
+#include "AgVideoBuffer.h"
 
 #ifdef AGORADL_EXPORTS	
 #define AGORADL_API __declspec(dllexport)  
@@ -245,6 +245,25 @@ extern "C" void AGORADL_API setVideoDevice(LPVOID lpExtInfo)
 	{
 		cout << "[error] Video setDevice failed :%d" << res << endl;
 	}
+}
+
+extern "C" void AGORADL_API setExternalVideoSource()
+{
+    
+    agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
+    mediaEngine.queryInterface(CAgoraObject::GetAgoraObject(nullptr)->GetEngine(), agora::AGORA_IID_MEDIA_ENGINE);
+    /*
+    mediaEngine->setExternalVideoSource(true, false);
+    */
+    AParameter apm(CAgoraObject::GetAgoraObject(nullptr)->GetEngine());
+
+    apm->setParameters("{\"che.video.local.camera_index\":1024}");
+	mediaEngine->registerVideoFrameObserver(&CAgoraObject::m_CExtendVideoFrameObserver);
+}
+
+extern "C" void AGORADL_API pushVideoFrame(char *buff, int w, int h)
+{
+    CAgVideoBuffer::GetInstance()->writeBuffer((BYTE*)buff, w, h);
 }
 
 

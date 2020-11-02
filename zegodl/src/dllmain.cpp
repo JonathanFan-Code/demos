@@ -95,6 +95,8 @@ extern "C" void ZEGODL_API createEngine()
 	string out;
 	CZegoObject::GetZegoObject()->createEngine(nullptr, out);
 	cout << out << endl;
+
+    cout <<"zego version:" << ZegoExpressSDK::getVersion() << endl;
 }
 
 extern "C" void ZEGODL_API destroyZegoEngine()

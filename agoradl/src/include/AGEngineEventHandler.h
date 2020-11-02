@@ -1,8 +1,9 @@
 #pragma once
 #include "../agora/include/IAgoraRtcEngine.h"
 #include <unordered_map>
-using namespace agora::rtc;
 #include "types.h"
+using namespace agora::rtc;
+
 
 
 class CAGEngineEventHandler :
@@ -43,6 +44,8 @@ public:
 
 	virtual void onLocalVideoStats(const LocalVideoStats& stats);
 	virtual void onRemoteVideoStats(const RemoteVideoStats& stats);
+    virtual void onLocalAudioStats(const LocalAudioStats& stats);
+    virtual void onRemoteAudioStats(const RemoteAudioStats& stats);
 	virtual void onCameraReady();
 	virtual void onVideoStopped();
 	virtual void onConnectionLost();

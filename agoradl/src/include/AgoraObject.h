@@ -10,6 +10,7 @@
 
 
 #include "AGEngineEventHandler.h"
+#include "ExtendVideoFrameObserver.h"
 
 
 //#include "AgoraAudInputManager.h"
@@ -85,4 +86,5 @@ public:
 	static void CloseAgoraObject();
 
 	static CAGEngineEventHandler m_EngineEventHandler;
+    static CExtendVideoFrameObserver m_CExtendVideoFrameObserver;
 };
