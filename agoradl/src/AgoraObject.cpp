@@ -1,6 +1,6 @@
 #include "AgoraObject.h"
 #include "AGExtInfoManager.h"
-#include "../agora/include/IAgoraRtcChannel.h"
+//#include "../agora/include/IAgoraRtcChannel.h"
 
 //#include "Base64.h"
 
@@ -132,7 +132,7 @@ BOOL CAgoraObject::JoinChannel(const char* lpChannelName, UINT nUID, const char*
 {
 
 	VideoCanvas canvas;
-	canvas.renderMode = RENDER_MODE_FIT;
+	canvas.renderMode = agora::media::base::RENDER_MODE_FIT;
 	CAGExtInfoManager *lpExtInfoManager = CAGExtInfoManager::GetAGExtInfoManager();
 	canvas.uid = nUID;
 	
@@ -222,10 +222,17 @@ BOOL CAgoraObject::MuteLocalAudio(BOOL bMuted)
 	if (m_lpAgoraEngine == NULL)
 		return false;
 
-	RtcEngineParameters rep(*m_lpAgoraEngine);
-
-	int ret = rep.muteLocalAudioStream((bool)bMuted);
-	if (ret == 0)
+	agora::base::AParameter msp(GetEngine());
+	auto ret = 0;
+	if (bMuted == TRUE)
+	{
+		ret = msp->setParameters("{\"rtc.audio.mute_me\": \"true\",\"che.audio.mute_me\":\"true\"}");
+	}
+	else 
+	{
+		ret = msp->setParameters("{\"rtc.audio.mute_me\": \"false\",\"che.audio.mute_me\":\"false\"}");
+	}
+	if(ret == 0)
 		m_bLocalAudioMuted = bMuted;
 
 	return ret == 0 ? TRUE : FALSE;
@@ -249,9 +256,17 @@ BOOL CAgoraObject::MuteLocalVideo(BOOL bMuted)
 	if (m_lpAgoraEngine == NULL)
 		return false;
 
-	RtcEngineParameters rep(*m_lpAgoraEngine);
+	agora::base::AParameter msp(GetEngine());
+	auto ret = 0;
+	if (bMuted == TRUE)
+	{
+		ret = msp->setParameters("{\"rtc.video.mute_me\": \"true\",\"che.video.local.send\":\"true\"}");
+	}
+	else
+	{
+		ret = msp->setParameters("{\"rtc.video.mute_me\": \"false\",\"che.video.local.send\":\"false\"}");
+	}
 
-	int ret = rep.muteLocalVideoStream((bool)bMuted);
 	if (ret == 0)
 		m_bLocalVideoMuted = bMuted;
 
@@ -263,4 +278,4 @@ BOOL CAgoraObject::MuteLocalVideo(BOOL bMuted)
 BOOL CAgoraObject::IsLocalVideoMuted()
 {
 	return m_bLocalVideoMuted;
-}
+}		

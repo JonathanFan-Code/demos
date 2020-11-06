@@ -44,13 +44,8 @@ bool CExtendVideoFrameObserver::onCaptureVideoFrame(VideoFrame& videoFrame)
 		videoFrame.height*videoFrame.width / 4);
 	videoFrame.vStride = videoFrame.width / 2;
 
-	videoFrame.type = FRAME_TYPE_YUV420;
+	videoFrame.type = agora::media::base::VIDEO_PIXEL_I420;
 	videoFrame.rotation = 0;
 
-	return true;
-}
-
-bool CExtendVideoFrameObserver::onRenderVideoFrame(unsigned int uid, VideoFrame& videoFrame)
-{
 	return true;
 }

@@ -119,7 +119,7 @@ extern "C" void AGORADL_API enableAudio(LPVOID lpExtInfo)
 extern "C" void AGORADL_API setParameters(LPVOID lpExtInfo)
 {
 	std::cout<<"setParameters:"<<(char*)lpExtInfo<<endl;
-	AParameter msp(CAgoraObject::GetAgoraObject(nullptr)->GetEngine());
+	agora::base::AParameter msp(CAgoraObject::GetAgoraObject(nullptr)->GetEngine());
 	msp->setParameters((char*)lpExtInfo);
 }
 
@@ -251,11 +251,11 @@ extern "C" void AGORADL_API setExternalVideoSource()
 {
     
     agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
-    mediaEngine.queryInterface(CAgoraObject::GetAgoraObject(nullptr)->GetEngine(), agora::AGORA_IID_MEDIA_ENGINE);
+    mediaEngine.queryInterface(CAgoraObject::GetAgoraObject(nullptr)->GetEngine(), agora::rtc::AGORA_IID_MEDIA_ENGINE);
     /*
     mediaEngine->setExternalVideoSource(true, false);
     */
-    AParameter apm(CAgoraObject::GetAgoraObject(nullptr)->GetEngine());
+	agora::base::AParameter apm(CAgoraObject::GetAgoraObject(nullptr)->GetEngine());
 
     apm->setParameters("{\"che.video.local.camera_index\":1024}");
 	mediaEngine->registerVideoFrameObserver(&CAgoraObject::m_CExtendVideoFrameObserver);

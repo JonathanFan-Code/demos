@@ -15,8 +15,9 @@ public:
 	~CExtendVideoFrameObserver();
 
 	virtual bool onCaptureVideoFrame(VideoFrame& videoFrame);
-    virtual VIDEO_FRAME_TYPE getVideoFormatPreference() { return FRAME_TYPE_YUV420; }
-	virtual bool onRenderVideoFrame(unsigned int uid, VideoFrame& videoFrame);
+	virtual agora::media::base::VIDEO_PIXEL_FORMAT getVideoPixelFormatPreference() { return agora::media::base::VIDEO_PIXEL_I420; };
+	virtual bool onRenderVideoFrame(agora::rtc::uid_t uid, agora::rtc::conn_id_t connectionId, VideoFrame& videoFrame) { return true; };
+	virtual bool onScreenCaptureVideoFrame(VideoFrame& videoFrame) { return true; };
 
 private:
     BYTE*				m_lpImageBuffer;
