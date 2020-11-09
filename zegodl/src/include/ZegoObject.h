@@ -4,7 +4,7 @@
 #include <string>
 
 #ifdef _M_IX86
-#pragma comment(lib, "../zego/lib/x86/ZegoExpressEngine.lib")
+#pragma comment(lib, "../zego/lib/ZegoExpressEngine.lib")
 #elif defined _M_X64
 #pragma comment(lib, "../zego/lib/x64/ZegoExpressEngine.lib")
 #endif
