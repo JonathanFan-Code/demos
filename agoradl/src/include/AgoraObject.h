@@ -3,7 +3,7 @@
 #include "../agora/include/IAgoraMediaEngine.h"
 #include "../agora/include/IAgoraRtcChannel.h"
 #ifdef _M_IX86
-#pragma comment(lib, "../agora/lib/x86/agora_rtc_sdk.lib")
+#pragma comment(lib, "../agora/lib/agora_rtc_sdk.lib")
 #elif defined _M_X64
 #pragma comment(lib, "../agora/lib/x64/agora_rtc_sdk.lib")
 #endif
