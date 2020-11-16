@@ -8,9 +8,10 @@ import numpy as np
 import threading, queue
 
 
+
 #app_id = "aab8b8f5a8cd4469a63042fcfafe7063"
 app_id = "b0630af62ce84025bb358c8b62fa7a4e"
-channel_name = "fantest12345"
+channel_name = "test"
 profile = {"bitrate": "1000", "fps": "15", "resolution": "640*480"}
 uid = random.randint(0,1000)
 
@@ -21,13 +22,15 @@ disableAudio = False
 disable3A = False
 
 enableCustomCapture = False
-customVideoSrc = "C:\\Users\\FJS\\Videos\\wudao.mp4"
+customVideoSrc = ".\\data\\wudao.mp4"
+customAudioSrc = ".\\data\\wudao-1-32k.wav"
 
 if isRobot == True:
     enableCustomCapture = True
 
 if enableCustomCapture == True:
-    import cv2  
+    import cv2
+    import wave
 
 
 def customVCapture(queue, agora):
@@ -61,8 +64,51 @@ def customVCapture(queue, agora):
         if cv2.waitKey(delay):
     	    pass
 
-vcapTask = None
+def customACapture(queue, agora):
+    wf = wave.open(customAudioSrc, 'rb')
+    CHUNK = 1024
+    
+    while True:
+        if queue.empty() == False:
+                cmd = queue.get()
+                if cmd == 'done':
+                    break
+        data = wf.readframes(CHUNK)
+        if len(data) > 0:
+            agora.pushAudioFrame(ctypes.c_char_p(data), ctypes.c_ulong(len(data)))
+        else:
+            wf.rewind()
+      
+'''
+def customACapture(queue, agora):
+        frequency = 16000  # Our played note will be 440 Hz
+        fs = 44100  # 44100 samples per second
+        seconds = 3  # Note duration of 3 seconds
+
+        # Generate array with seconds*sample_rate steps, ranging between 0 and seconds
+        t = np.linspace(0, seconds, seconds * fs, False)
+
+        # Generate a 440 Hz sine wave
+        note = np.sin(frequency * t * 2 * np.pi)
+
+        # Ensure that highest value is in 16-bit range
+        audio = note * (2**15 - 1) / np.max(np.abs(note))
+        # Convert to 16-bit data
+        audio = audio.astype(np.int16)
+        #agora.pushAudioFrame(audio.ctypes.data_as(ctypes.c_char_p), ctypes.c_ulong(len(audio)))
+        # Start playback
+        import simpleaudio as sa
+        play_obj = sa.play_buffer(audio, 1, 2, fs)
+
+        # Wait for playback to finish before exiting
+        play_obj.wait_done()
+'''          
+vCapTask = None
 vQueue = None
+
+aCapTask = None
+aQueue = None
+
 
 if __name__ ==  '__main__':
     try:
@@ -91,7 +137,7 @@ if __name__ ==  '__main__':
             agora.addView(ctypes.c_ulonglong(frame_id))
 
         agora.createEngine(ctypes.c_char_p(bytes(app_id, 'utf-8')))
-    
+
         enableAudio = json.dumps({"enable": "true"})
         if disableAudio == True:
             enableAudio = json.dumps({"enable": "false"})
@@ -103,7 +149,9 @@ if __name__ ==  '__main__':
         agora.enableVideo(ctypes.c_char_p(bytes(enableVideo, 'utf-8')))
 
         if enableCustomCapture == True:
-            agora.setExternalVideoSource()
+            agora.enableVideoCustomCap()
+            wf = wave.open(customAudioSrc, 'rb')
+            agora.enableAudioCustomCap(ctypes.c_int32(wf.getframerate()), ctypes.c_int32(wf.getnchannels()))
         
         #agora.enumerateRecordingDevices()
         #agora.enumerateVideoDevices()
@@ -130,10 +178,12 @@ if __name__ ==  '__main__':
         if enableCustomCapture == True:
             try:
                 vQueue = queue.Queue()
-                #customVCapture(vQueue, agora)
-                vcapTask = threading.Thread(target=customVCapture, args=(vQueue, agora))
-                vcapTask.start()  
-                
+                vCapTask = threading.Thread(target=customVCapture, args=(vQueue, agora))
+                vCapTask.start()  
+
+                aQueue = queue.Queue()
+                aCapTask = threading.Thread(target=customACapture, args=(aQueue, agora))
+                aCapTask.start()
             except Exception as e:
                 print(e)
         window.mainloop()
@@ -141,8 +191,11 @@ if __name__ ==  '__main__':
     except Exception as e:
         print(e)
     finally:
-        if vcapTask is not None:
+        if vCapTask is not None:
             vQueue.put("done")
-            vcapTask.join()
+            vCapTask.join()
+        if aCapTask is not None:
+            aQueue.put("done")
+            aCapTask.join()
         agora.leaveChannel()
         agora.destroyEngine()

@@ -247,9 +247,8 @@ extern "C" void AGORADL_API setVideoDevice(LPVOID lpExtInfo)
 	}
 }
 
-extern "C" void AGORADL_API setExternalVideoSource()
+extern "C" void AGORADL_API  enableVideoCustomCap()
 {
-    
     agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
     mediaEngine.queryInterface(CAgoraObject::GetAgoraObject(nullptr)->GetEngine(), agora::AGORA_IID_MEDIA_ENGINE);
     /*
@@ -264,6 +263,24 @@ extern "C" void AGORADL_API setExternalVideoSource()
 extern "C" void AGORADL_API pushVideoFrame(char *buff, int w, int h)
 {
     CAgVideoBuffer::GetInstance()->writeBuffer((BYTE*)buff, w, h);
+}
+
+
+extern "C" void AGORADL_API  enableAudioCustomCap(int nSampleRate, int nChannels)
+{
+	agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
+	mediaEngine.queryInterface(CAgoraObject::GetAgoraObject(nullptr)->GetEngine(), agora::AGORA_IID_MEDIA_ENGINE);
+
+	RtcEngineParameters rep(CAgoraObject::GetAgoraObject(nullptr)->GetEngine());
+//	rep.setExternalAudioSource(true, nSampleRate, nChannels);
+
+	CircleBuffer::GetInstance()->setAudioInfo(nSampleRate, nChannels);
+	mediaEngine->registerAudioFrameObserver(&CAgoraObject::m_CExtendAudioFrameObserver);
+}
+
+extern "C" void AGORADL_API pushAudioFrame(char *buff, int size)
+{
+	CircleBuffer::GetInstance()->writeBuffer(buff, size);
 }
 
 
