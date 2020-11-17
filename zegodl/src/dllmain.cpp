@@ -11,7 +11,6 @@
 #include "AGExtInfoManager.h"
 using namespace std;
 
-
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -212,6 +211,11 @@ extern "C" void ZEGODL_API disableeAGC()
 extern "C" void ZEGODL_API muteMicrophone()
 {
 	CZegoObject::GetZegoObject()->getEngine()->muteMicrophone(true);
+}
+
+extern "C" void ZEGODL_API logOff()
+{
+	g_Logon = false;
 }
 
 

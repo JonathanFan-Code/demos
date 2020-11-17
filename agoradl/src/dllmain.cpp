@@ -283,6 +283,33 @@ extern "C" void AGORADL_API pushAudioFrame(char *buff, int size)
 	CircleBuffer::GetInstance()->writeBuffer(buff, size);
 }
 
+extern "C" void AGORADL_API muteAllRemoteVideoStreams()
+{
+	CAgoraObject::GetAgoraObject(nullptr)->GetEngine()->muteAllRemoteVideoStreams(true);
+}
+
+extern "C" void AGORADL_API muteAllRemoteAudioStreams()
+{
+	CAgoraObject::GetAgoraObject(nullptr)->GetEngine()->muteAllRemoteAudioStreams(true);
+}
+
+//在有高音质需求的场景（例如音乐教学场景）中，建议将 profile 设置为 AUDIO_PROFILE_MUSIC_HIGH_QUALITY (4)
+//，scenario 设置为 AUDIO_SCENARIO_GAME_STREAMING (3)。
+extern "C" void AGORADL_API setAudioProfile(int profile, int scenario)
+{
+	CAgoraObject::GetAgoraObject(nullptr)->GetEngine()->setAudioProfile((AUDIO_PROFILE_TYPE)profile, (AUDIO_SCENARIO_TYPE)scenario);
+}
+
+extern "C" void AGORADL_API stopPreview()
+{
+	CAgoraObject::GetAgoraObject(nullptr)->GetEngine()->stopPreview();
+}
+
+extern "C" void AGORADL_API logOff()
+{
+	g_Logon = false;
+}
+
 
 
 

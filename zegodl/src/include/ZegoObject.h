@@ -15,6 +15,7 @@ using namespace ZEGO::EXPRESS;
 using namespace ZEGO;
 using namespace std;
 
+extern std::atomic<bool> g_Logon;
 
 class CZegoObject 
 {

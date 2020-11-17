@@ -22,6 +22,7 @@
 //#include "AudioPlayPackageQueue.h"
 #include <map>
 #include <string>
+#include <atomic>
 
 using std::map;
 using std::string;
@@ -38,6 +39,7 @@ using namespace agora;
 
 using namespace agora::rtc;
 
+extern std::atomic<bool> g_Logon;
 
 class CAgoraObject
 {

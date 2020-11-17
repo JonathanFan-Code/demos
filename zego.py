@@ -8,7 +8,7 @@ import time
 
 
 channelName = "test"
-profile = {"bitrate": "600", "fps": "15", "resolution": "640*320"}
+profile = {"bitrate": "1000", "fps": "15", "resolution": "640*480"}
 
 isRobot = False
 disableVideo = False
@@ -19,10 +19,13 @@ disableAudio = False
 disable3A = False
 
 enableCustomCapture = False
-customVideoSrc = "C:\\Users\\FJS\\Videos\\wudao.mp4"
+customVideoSrc = ".\\data\\wudao.mp4"
 
 enableHwenc = False
 enableHwdec = False
+
+current_dir = os.path.abspath(os.path.dirname(__file__))
+customVideoSrc = os.path.join(current_dir, customVideoSrc)
 
 if isRobot == True:
     enableCustomCapture = True
@@ -51,7 +54,7 @@ try:
                 anchor = tkinter.NW, relwidth = 1, relheight = relative_height)
         frame_id = display_frame.winfo_id()
         zego.addView(ctypes.c_ulonglong(frame_id), ctypes.c_ulonglong(number))
-
+    
     zego.createEngine()
 
     #zego.enumerateRecordingDevices()
@@ -101,6 +104,7 @@ try:
         zego.stopPlayingStream()
         zego.muteSpeaker()
         zego.muteMicrophone()
+        zego.logOff()
 
     window.mainloop()
 finally:

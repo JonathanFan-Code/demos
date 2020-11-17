@@ -25,6 +25,11 @@ enableCustomCapture = False
 customVideoSrc = ".\\data\\wudao.mp4"
 customAudioSrc = ".\\data\\wudao-1-32k.wav"
 
+
+current_dir = os.path.abspath(os.path.dirname(__file__))
+customVideoSrc = os.path.join(current_dir, customVideoSrc)
+customAudioSrc = os.path.join(current_dir, customAudioSrc)
+
 if isRobot == True:
     enableCustomCapture = True
 
@@ -148,6 +153,11 @@ if __name__ ==  '__main__':
             enableVideo = json.dumps({"enable": "false"})
         agora.enableVideo(ctypes.c_char_p(bytes(enableVideo, 'utf-8')))
 
+        if isRobot == True:
+            agora.logOff()
+            agora.muteAllRemoteVideoStreams()
+            agora.muteAllRemoteAudioStreams()
+            #agora.stopPreview()
         if enableCustomCapture == True:
             agora.enableVideoCustomCap()
             wf = wave.open(customAudioSrc, 'rb')

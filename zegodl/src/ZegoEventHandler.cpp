@@ -42,36 +42,48 @@ void CZegoEventHandler::onRoomStreamUpdate(const std::string &roomID, ZegoUpdate
 
 void CZegoEventHandler::onPublisherVideoSizeChanged(int width, int height, ZegoPublishChannel channel)
 {
-	std::cout << "zego capture w:" << width << " h:" << height << " channel" << channel << std::endl;
+	if (g_Logon == true)
+	{
+		std::cout << "zego capture w:" << width << " h:" << height << " channel" << channel << std::endl;
+	}
 }
 
 void CZegoEventHandler::onPlayerVideoSizeChanged(const std::string & streamID, int width, int height)
 {
-	std::cout << "zego play streamID:" << streamID <<" w:"<< width << " h:" << height << std::endl;
+	if (g_Logon == true)
+	{
+		std::cout << "zego play streamID:" << streamID <<" w:"<< width << " h:" << height << std::endl;
+	}
 }
 
 void CZegoEventHandler::onPublisherQualityUpdate(const std::string &streamID, const ZegoPublishStreamQuality& quality)
 {
-	std::cout << "zego Publisher Quality streamID:" << streamID << " vcap fps:" << quality.videoCaptureFPS //<< std::endl
-		<< " venc fps:" << quality.videoEncodeFPS << " vsend fps:" << quality.videoSendFPS << " vsend kbps:" << quality.videoKBPS //<< std::endl
-		<< " acap fps:" << quality.audioCaptureFPS << " asend fps:" << quality.audioSendFPS << " asend kbps:" << quality.audioKBPS// << std::endl
-		<< " rtt(ms):" << quality.rtt << " packetLostRate fps:" << quality.packetLostRate << " quality level:" << quality.level //<< std::endl
-		<< " isHardwareEncode:" << quality.isHardwareEncode << " totalSendBytes:" << quality.totalSendBytes << " audioSendBytes:" << quality.audioSendBytes
-		<< " videoSendBytes:" << quality.videoSendBytes << std::endl;
+	if (g_Logon == true)
+	{
+		std::cout << "zego Publisher Quality streamID:" << streamID << " vcap fps:" << quality.videoCaptureFPS //<< std::endl
+			<< " venc fps:" << quality.videoEncodeFPS << " vsend fps:" << quality.videoSendFPS << " vsend kbps:" << quality.videoKBPS //<< std::endl
+			<< " acap fps:" << quality.audioCaptureFPS << " asend fps:" << quality.audioSendFPS << " asend kbps:" << quality.audioKBPS// << std::endl
+			<< " rtt(ms):" << quality.rtt << " packetLostRate fps:" << quality.packetLostRate << " quality level:" << quality.level //<< std::endl
+			<< " isHardwareEncode:" << quality.isHardwareEncode << " totalSendBytes:" << quality.totalSendBytes << " audioSendBytes:" << quality.audioSendBytes
+			<< " videoSendBytes:" << quality.videoSendBytes << std::endl;
+	}
 
 }
 
 void CZegoEventHandler::onPlayerQualityUpdate(const std::string &streamID, const ZegoPlayStreamQuality& quality)
 {
-	std::cout << "zego Play Quality streamID:" << streamID << " vRecv fps:" << quality.videoRecvFPS //<< std::endl
-		<< " vdec fps:" << quality.videoDecodeFPS << " vRend fps:" << quality.videoRenderFPS << " v kbps:" << quality.videoKBPS //<< std::endl
-		<< " aRecv fps:" << quality.audioRecvFPS << " aDec fps:" << quality.audioDecodeFPS << " aRend fps:" << quality.audioRenderFPS 
-		<<" aKBPS:"<< quality.audioKBPS //<< std::endl
-		<< " rtt(ms):" << quality.rtt << " packetLostRate fps:" << quality.packetLostRate << " peerToPeerDelay:" 
-		<< quality.peerToPeerDelay << " peerToPeerPacketLostRate:" << quality.peerToPeerPacketLostRate << " quality level:" << quality.level //<< std::endl
-		<< " delay:" << quality.delay << " isHardwareDecode:" << quality.isHardwareDecode
-		<< " totalRecvBytes:" << quality.totalRecvBytes << " audioRecvBytes:" << quality.audioRecvBytes
-		<< " videoRecvBytes:" << quality.videoRecvBytes << std::endl;
+	if (g_Logon == true)
+	{
+		std::cout << "zego Play Quality streamID:" << streamID << " vRecv fps:" << quality.videoRecvFPS //<< std::endl
+			<< " vdec fps:" << quality.videoDecodeFPS << " vRend fps:" << quality.videoRenderFPS << " v kbps:" << quality.videoKBPS //<< std::endl
+			<< " aRecv fps:" << quality.audioRecvFPS << " aDec fps:" << quality.audioDecodeFPS << " aRend fps:" << quality.audioRenderFPS 
+			<<" aKBPS:"<< quality.audioKBPS //<< std::endl
+			<< " rtt(ms):" << quality.rtt << " packetLostRate fps:" << quality.packetLostRate << " peerToPeerDelay:" 
+			<< quality.peerToPeerDelay << " peerToPeerPacketLostRate:" << quality.peerToPeerPacketLostRate << " quality level:" << quality.level //<< std::endl
+			<< " delay:" << quality.delay << " isHardwareDecode:" << quality.isHardwareDecode
+			<< " totalRecvBytes:" << quality.totalRecvBytes << " audioRecvBytes:" << quality.audioRecvBytes
+			<< " videoRecvBytes:" << quality.videoRecvBytes << std::endl;
+	}
 }
 
 void CustomVideoCapturer::onStart(ZegoPublishChannel channel)

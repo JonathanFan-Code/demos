@@ -6,6 +6,7 @@
 
 
 CZegoObject *CZegoObject::m_lpZegoObject = NULL;
+std::atomic<bool> g_Logon = true;
 
 CZegoObject::CZegoObject(void)
 {
