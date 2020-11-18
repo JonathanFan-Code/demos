@@ -20,9 +20,36 @@ disable3A = False
 
 enableCustomCapture = False
 customVideoSrc = ".\\data\\wudao.mp4"
+#customVideoSrc = "C:\\Users\\FJS\\Videos\\wudao-sine.mp4"
 
 enableHwenc = False
 enableHwdec = False
+
+'''
+audioProfile
+0 for 16 kbps, Mono, ZegoAudioCodecIDDefault             sine 4-5k
+1 for 48 kbps, Mono, ZegoAudioCodecIDDefault  (default)  sine 13k
+2 for 56 kbps, Stereo, ZegoAudioCodecIDDefault
+3 for 128 kbps, Mono, ZegoAudioCodecIDDefault            sine 17-18k
+4 for 192 kbps, Stereo, ZegoAudioCodecIDDefault
+audioCodecId
+ZEGO_AUDIO_CODEC_ID_DEFAULT = 0,
+/** Normal */
+ZEGO_AUDIO_CODEC_ID_NORMAL = 1,
+/** Normal2 */
+ZEGO_AUDIO_CODEC_ID_NORMAL2 = 2,   
+/** Normal3 */
+ZEGO_AUDIO_CODEC_ID_NORMAL3 = 3,   
+/** Low */
+ZEGO_AUDIO_CODEC_ID_LOW = 4,
+/** Low2 */
+ZEGO_AUDIO_CODEC_ID_LOW2 = 5,
+/** Low3 */
+ZEGO_AUDIO_CODEC_ID_LOW3 = 6
+'''
+audioProfile = None
+audioProfile = 0
+audioCodecId = 0
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 customVideoSrc = os.path.join(current_dir, customVideoSrc)
@@ -84,6 +111,9 @@ try:
         zego.disableAEC()
         zego.disableANS()
         zego.disableeAGC()
+
+    if audioProfile is not None:
+        zego.setAudioConfig(ctypes.c_int(audioProfile), ctypes.c_int(audioCodecId))
 
     uid = "fan"+str(random.randint(0,1000))
     channel = json.dumps({"channelId":channelName,"uid":uid})

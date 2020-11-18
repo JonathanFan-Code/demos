@@ -213,6 +213,13 @@ extern "C" void ZEGODL_API muteMicrophone()
 	CZegoObject::GetZegoObject()->getEngine()->muteMicrophone(true);
 }
 
+extern "C" void ZEGODL_API setAudioConfig(int profile, int codecid)
+{
+	ZegoAudioConfig audioConfig = ZegoAudioConfig((ZegoAudioConfigPreset)profile);
+	audioConfig.codecID = (ZegoAudioCodecID)codecid;
+	CZegoObject::GetZegoObject()->getEngine()->setAudioConfig(audioConfig);
+}
+
 extern "C" void ZEGODL_API logOff()
 {
 	g_Logon = false;

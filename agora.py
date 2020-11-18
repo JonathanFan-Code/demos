@@ -21,11 +21,13 @@ disableVideo = False
 disableAudio = False
 disable3A = False
 
+baselineVideo = False
+
 enableCustomCapture = False
 customVideoSrc = ".\\data\\wudao.mp4"
 customAudioSrc = ".\\data\\wudao-1-32k.wav"
 
-
+loopback = False
 current_dir = os.path.abspath(os.path.dirname(__file__))
 customVideoSrc = os.path.join(current_dir, customVideoSrc)
 customAudioSrc = os.path.join(current_dir, customAudioSrc)
@@ -36,6 +38,7 @@ if isRobot == True:
 if enableCustomCapture == True:
     import cv2
     import wave
+
 
 
 def customVCapture(queue, agora):
@@ -153,6 +156,13 @@ if __name__ ==  '__main__':
             enableVideo = json.dumps({"enable": "false"})
         agora.enableVideo(ctypes.c_char_p(bytes(enableVideo, 'utf-8')))
 
+        if baselineVideo == True:
+            #100:high， 66:baseline
+            parameter = '{"che.video.h264Profile" : 66}'
+            agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
+
+        #agora.setAudioProfile(profile, scenario)
+
         if isRobot == True:
             agora.logOff()
             agora.muteAllRemoteVideoStreams()
@@ -166,7 +176,7 @@ if __name__ ==  '__main__':
         #agora.enumerateRecordingDevices()
         #agora.enumerateVideoDevices()
 
-        #agora.setRecordingDevice(ctypes.c_char_p(bytes("", 'utf-8')))
+        #agora.setRecordingDevice(ctypes.c_char_p(bytes("{0.0.1.00000000}.{5c5eacc2-a2df-47db-9e25-5e6da81b5ae8}", 'utf-8')))
         #agora.setVideoDevice(ctypes.c_char_p(bytes("YY开播", 'utf-8')))
 
         channelProfile = json.dumps({"channelprofile": "1"})
