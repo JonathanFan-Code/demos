@@ -13,6 +13,7 @@ import threading, queue
 app_id = "b0630af62ce84025bb358c8b62fa7a4e"
 channel_name = "test"
 profile = {"bitrate": "1000", "fps": "15", "resolution": "640*480"}
+#profile = {"bitrate": "6000", "fps": "60", "resolution": "1920*1080"}
 uid = random.randint(0,1000)
 
 isRobot = False
@@ -26,6 +27,8 @@ baselineVideo = False
 enableCustomCapture = False
 customVideoSrc = ".\\data\\wudao.mp4"
 customAudioSrc = ".\\data\\wudao-1-32k.wav"
+
+dllpath = "agoradl/bin"
 
 loopback = False
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -121,7 +124,7 @@ aQueue = None
 if __name__ ==  '__main__':
     try:
         current_dir = os.path.abspath(os.path.dirname(__file__))
-        current_dir = os.path.join(current_dir,"agoradl/bin")
+        current_dir = os.path.join(current_dir, dllpath)
         os.chdir(current_dir)
         print(current_dir)
         if sys.version_info[0] >= 3 and sys.version_info[1] >= 8:

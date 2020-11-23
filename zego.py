@@ -22,6 +22,8 @@ enableCustomCapture = False
 customVideoSrc = ".\\data\\wudao.mp4"
 #customVideoSrc = "C:\\Users\\FJS\\Videos\\wudao-sine.mp4"
 
+dllpath = "zegodl/bin"
+
 enableHwenc = False
 enableHwdec = False
 
@@ -48,8 +50,8 @@ ZEGO_AUDIO_CODEC_ID_LOW2 = 5,
 ZEGO_AUDIO_CODEC_ID_LOW3 = 6
 '''
 audioProfile = None
-audioProfile = 0
-audioCodecId = 0
+#audioProfile = 0
+#audioCodecId = 0
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 customVideoSrc = os.path.join(current_dir, customVideoSrc)
@@ -59,7 +61,7 @@ if isRobot == True:
 
 try:
     current_dir = os.path.abspath(os.path.dirname(__file__))
-    current_dir = os.path.join(current_dir,"zegodl/bin")
+    current_dir = os.path.join(current_dir, dllpath)
     os.chdir(current_dir)
     print(current_dir)
     if sys.version_info[0] >= 3 and sys.version_info[1] >= 8:

@@ -5,7 +5,7 @@ import time
 processes = []
 try:
     for i in range(6):
-        processes.append(subprocess.Popen(["python.exe", "agora.py"]))
+        processes.append(subprocess.Popen(["python.exe", "zego.py"]))
         time.sleep(5)
 
     a = input()
