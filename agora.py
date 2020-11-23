@@ -12,7 +12,10 @@ import threading, queue
 #app_id = "aab8b8f5a8cd4469a63042fcfafe7063"
 app_id = "b0630af62ce84025bb358c8b62fa7a4e"
 channel_name = "test"
-profile = {"bitrate": "1000", "fps": "15", "resolution": "640*480"}
+
+v_w = 320
+v_h = 240
+profile = {"bitrate": "1000", "fps": "15", "resolution": str(v_w)+"*"+str(v_h)}
 #profile = {"bitrate": "6000", "fps": "60", "resolution": "1920*1080"}
 uid = random.randint(0,1000)
 
@@ -42,8 +45,6 @@ if enableCustomCapture == True:
     import cv2
     import wave
 
-
-
 def customVCapture(queue, agora):
     cap = cv2.VideoCapture(customVideoSrc)
     rate = cap.get(cv2.CAP_PROP_FPS)
@@ -64,13 +65,12 @@ def customVCapture(queue, agora):
             frame_counter = 0 #Or whatever as long as it is the same as next line
             cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-        h = frame.shape[0]
-        w = frame.shape[1]
+        frame = cv2.resize(frame, (v_w, v_h))
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2YUV_I420)  
         #cv2.imshow("test", frame)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2YUV_I420)
         #frame = frame.astype(np.uint8)
         data_p = frame.ctypes.data_as(ctypes.c_char_p)
-        agora.pushVideoFrame(data_p, w, h)
+        agora.pushVideoFrame(data_p, v_w, v_h)
         
         if cv2.waitKey(delay):
     	    pass
