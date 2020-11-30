@@ -24,12 +24,18 @@ isRobot = False
 disableVideo = False
 disableAudio = False
 disable3A = False
+disableFec = False
 
 baselineVideo = False
 
+audioSpecifyCodec = None
+#audioSpecifyCodec = "OPUSFB"
+robot_audio_samplrate = 32000
+robot_audio_chans = 1
+
 enableCustomCapture = False
 customVideoSrc = ".\\data\\wudao.mp4"
-customAudioSrc = ".\\data\\wudao-1-32k.wav"
+customAudioSrc = ".\\data\\wudao-2-48.wav"
 
 dllpath = "agoradl/bin"
 
@@ -44,6 +50,9 @@ if isRobot == True:
 if enableCustomCapture == True:
     import cv2
     import wave
+    import audioop
+
+
 
 def customVCapture(queue, agora):
     cap = cv2.VideoCapture(customVideoSrc)
@@ -78,15 +87,21 @@ def customVCapture(queue, agora):
 def customACapture(queue, agora):
     wf = wave.open(customAudioSrc, 'rb')
     CHUNK = 1024
-    
+    state = None
     while True:
         if queue.empty() == False:
                 cmd = queue.get()
                 if cmd == 'done':
                     break
         data = wf.readframes(CHUNK)
-        if len(data) > 0:
-            agora.pushAudioFrame(ctypes.c_char_p(data), ctypes.c_ulong(len(data)))
+        width = 2
+        inchannels = 2
+        insamplerate = 48000
+        converted, state = audioop.ratecv(data, width, inchannels, insamplerate, robot_audio_samplrate, state)
+        if robot_audio_chans == 1:
+            converted = audioop.tomono(converted, 2, 1, 0)
+        if len(converted) > 0:
+            agora.pushAudioFrame(ctypes.c_char_p(converted), ctypes.c_ulong(len(converted)))
         else:
             wf.rewind()
       
@@ -165,7 +180,7 @@ if __name__ ==  '__main__':
             agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
 
         #agora.setAudioProfile(profile, scenario)
-
+       
         if isRobot == True:
             agora.logOff()
             agora.muteAllRemoteVideoStreams()
@@ -173,9 +188,10 @@ if __name__ ==  '__main__':
             #agora.stopPreview()
         if enableCustomCapture == True:
             agora.enableVideoCustomCap()
-            wf = wave.open(customAudioSrc, 'rb')
-            agora.enableAudioCustomCap(ctypes.c_int32(wf.getframerate()), ctypes.c_int32(wf.getnchannels()))
-        
+            #wf = wave.open(customAudioSrc, 'rb')
+            #agora.enableAudioCustomCap(ctypes.c_int32(wf.getframerate()), ctypes.c_int32(wf.getnchannels()))
+            agora.enableAudioCustomCap(ctypes.c_int32(robot_audio_samplrate), ctypes.c_int32(robot_audio_chans))
+            
         #agora.enumerateRecordingDevices()
         #agora.enumerateVideoDevices()
 
@@ -193,6 +209,17 @@ if __name__ ==  '__main__':
         
         if disable3A == True:
             parameter = '{"che.audio.bypass.apm" : true}'
+            agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
+
+        if disableFec == True:
+            parameter = '{"che.video.fecMethod", 0}'
+            agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
+
+            parameter = '{"che.audio.uplink.fec",false}'
+            agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
+
+        if audioSpecifyCodec is not None:    
+            parameter = json.dumps({"che.audio.specify.codec": audioSpecifyCodec})
             agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
 
         channel = json.dumps({"channelId":channel_name,"uid":str(uid)})
