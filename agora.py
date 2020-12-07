@@ -9,8 +9,8 @@ import threading, queue
 
 
 
-#app_id = "aab8b8f5a8cd4469a63042fcfafe7063"
-app_id = "b0630af62ce84025bb358c8b62fa7a4e"
+app_id = "aab8b8f5a8cd4469a63042fcfafe7063"
+#app_id = "b0630af62ce84025bb358c8b62fa7a4e"
 channel_name = "test"
 
 v_w = 640
@@ -38,6 +38,7 @@ customVideoSrc = ".\\data\\wudao.mp4"
 customAudioSrc = ".\\data\\wudao-2-48.wav"
 
 dllpath = "agoradl/bin"
+
 
 loopback = False
 current_dir = os.path.abspath(os.path.dirname(__file__))
