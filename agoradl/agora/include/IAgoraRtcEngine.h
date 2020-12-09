@@ -95,6 +95,10 @@ enum AUDIO_MIXING_STATE_TYPE {
    See #AUDIO_MIXING_ERROR_TYPE. 
    */
   AUDIO_MIXING_STATE_FAILED = 714,
+  /** 715: The audio mixing file is played once. */
+  AUDIO_MIXING_STATE_COMPLETED = 715,
+  /** 716: The audio mixing file is all played out. */
+  AUDIO_MIXING_STATE_ALL_LOOPS_COMPLETED = 716,
 };
 
 /**
@@ -3790,13 +3794,13 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - During a call, you can call this method as many times as necessary to update the local video view.
    *
    * @param renderMode Sets the local display mode. See #RENDER_MODE_TYPE.
-   * @param mirrorType Sets the local mirror mode. See #VIDEO_MIRROR_MODE_TYPE.
+   * @param mirrorMode Sets the local mirror mode. See #VIDEO_MIRROR_MODE_TYPE.
    *
    * @return
    * - 0: Success.
    * - < 0: Failure.
    */
-  virtual int setLocalRenderMode(media::base::RENDER_MODE_TYPE renderMode, VIDEO_MIRROR_MODE_TYPE mirrorType) = 0;
+  virtual int setLocalRenderMode(media::base::RENDER_MODE_TYPE renderMode, VIDEO_MIRROR_MODE_TYPE mirrorMode) = 0;
   /**
    * Updates the display mode of the video view of a remote user.
    *
@@ -3811,7 +3815,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    *
    * @param uid ID of the remote user.
    * @param renderMode Sets the remote display mode. See #RENDER_MODE_TYPE.
-   * @param mirrorType Sets the mirror type. See #VIDEO_MIRROR_MODE_TYPE.
+   * @param mirrorMode Sets the mirror type. See #VIDEO_MIRROR_MODE_TYPE.
    * @param connectionId ID of the connection.
    *
    * @return
@@ -3819,7 +3823,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure.
    */
   virtual int setRemoteRenderMode(uid_t uid, media::base::RENDER_MODE_TYPE renderMode,
-                                  VIDEO_MIRROR_MODE_TYPE mirrorType,
+                                  VIDEO_MIRROR_MODE_TYPE mirrorMode,
                                   conn_id_t connectionId = DEFAULT_CONNECTION_ID) = 0;
   
 
@@ -4871,6 +4875,98 @@ class IRtcEngine : public agora::base::IEngineBase {
       const char* uuid, const char* passwd, int64_t duration_ms, bool auto_upload) = 0;
 
   virtual int stopAudioFrameDump(const char* channel_id, uid_t user_id, const char* location) = 0;
+
+    /** Starts to relay media streams across channels.
+     *
+     * After a successful method call, the SDK triggers the
+     * \ref agora::rtc::IRtcEngineEventHandler::onChannelMediaRelayStateChanged
+     *  "onChannelMediaRelayStateChanged" and
+     * \ref agora::rtc::IRtcEngineEventHandler::onChannelMediaRelayEvent
+     * "onChannelMediaRelayEvent" callbacks, and these callbacks return the
+     * state and events of the media stream relay.
+     * - If the
+     * \ref agora::rtc::IRtcEngineEventHandler::onChannelMediaRelayStateChanged
+     *  "onChannelMediaRelayStateChanged" callback returns
+     * #RELAY_STATE_RUNNING (2) and #RELAY_OK (0), and the
+     * \ref agora::rtc::IRtcEngineEventHandler::onChannelMediaRelayEvent
+     * "onChannelMediaRelayEvent" callback returns
+     * #RELAY_EVENT_PACKET_SENT_TO_DEST_CHANNEL (4), the host starts
+     * sending data to the destination channel.
+     * - If the
+     * \ref agora::rtc::IRtcEngineEventHandler::onChannelMediaRelayStateChanged
+     *  "onChannelMediaRelayStateChanged" callback returns
+     * #RELAY_STATE_FAILURE (3), an exception occurs during the media stream
+     * relay.
+     *
+     * @note
+     * - Call this method after the \ref joinChannel() "joinChannel" method.
+     * - This method takes effect only when you are a host in a
+     * `LIVE_BROADCASTING` channel.
+     * - After a successful method call, if you want to call this method
+     * again, ensure that you call the
+     * \ref stopChannelMediaRelay() "stopChannelMediaRelay" method to quit the
+     * current relay.
+     * - Contact sales-us@agora.io before implementing this function.
+     * - We do not support string user accounts in this API.
+     *
+     * @param configuration The configuration of the media stream relay:
+     * ChannelMediaRelayConfiguration.
+     *
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+     */
+  virtual int startChannelMediaRelay(const ChannelMediaRelayConfiguration &configuration) = 0;
+    /** Updates the channels for media stream relay. After a successful
+     * \ref startChannelMediaRelay() "startChannelMediaRelay" method call, if
+     * you want to relay the media stream to more channels, or leave the
+     * current relay channel, you can call the
+     * \ref updateChannelMediaRelay() "updateChannelMediaRelay" method.
+     *
+     * After a successful method call, the SDK triggers the
+     * \ref agora::rtc::IRtcEngineEventHandler::onChannelMediaRelayEvent
+     *  "onChannelMediaRelayEvent" callback with the
+     * #RELAY_EVENT_PACKET_UPDATE_DEST_CHANNEL (7) state code.
+     *
+     * @note
+     * Call this method after the
+     * \ref startChannelMediaRelay() "startChannelMediaRelay" method to update
+     * the destination channel.
+     *
+     * @param configuration The media stream relay configuration:
+     * ChannelMediaRelayConfiguration.
+     *
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+     */
+  virtual int updateChannelMediaRelay(const ChannelMediaRelayConfiguration &configuration) = 0;
+    /** Stops the media stream relay.
+     *
+     * Once the relay stops, the host quits all the destination
+     * channels.
+     *
+     * After a successful method call, the SDK triggers the
+     * \ref agora::rtc::IRtcEngineEventHandler::onChannelMediaRelayStateChanged
+     *  "onChannelMediaRelayStateChanged" callback. If the callback returns
+     * #RELAY_STATE_IDLE (0) and #RELAY_OK (0), the host successfully
+     * stops the relay.
+     *
+     * @note
+     * If the method call fails, the SDK triggers the
+     * \ref agora::rtc::IRtcEngineEventHandler::onChannelMediaRelayStateChanged
+     *  "onChannelMediaRelayStateChanged" callback with the
+     * #RELAY_ERROR_SERVER_NO_RESPONSE (2) or
+     * #RELAY_ERROR_SERVER_CONNECTION_LOST (8) state code. You can leave the
+     * channel by calling the \ref leaveChannel() "leaveChannel" method, and
+     * the media stream relay automatically stops.
+     *
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+     */
+  virtual int stopChannelMediaRelay() = 0;
+
 };
 
 
