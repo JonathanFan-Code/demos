@@ -14,6 +14,10 @@ CAgoraObject *CAgoraObject::m_lpAgoraObject = NULL;
 IRtcEngine *CAgoraObject::m_lpAgoraEngine = NULL;
 CAGEngineEventHandler CAgoraObject::m_EngineEventHandler;
 CExtendVideoFrameObserver CAgoraObject::m_CExtendVideoFrameObserver;
+CExtendAudioFrameObserver CAgoraObject::m_CExtendAudioFrameObserver;
+
+std::atomic<bool> g_Logon = true;
+
 
 CAgoraObject::CAgoraObject(void)
 	: m_dwEngineFlag(0)

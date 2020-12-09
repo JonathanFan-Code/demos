@@ -608,13 +608,16 @@ Parameters
 */
 void CAGEngineEventHandler::onLocalVideoStats(const LocalVideoStats& stats)
 {
-	std::cout << "agora LocalVideoStats sentBitrate:" << stats.sentBitrate << " sent fps:" << stats.sentFrameRate << " enc fps:" << stats.encoderOutputFrameRate
-		<< " rendererOutputFrameRate:" << stats.rendererOutputFrameRate << " targetBitrate:" << stats.targetBitrate
-		<< " targetFrameRate:" << stats.targetFrameRate
-		<< " encodedBitrate:" << stats.encodedBitrate << " w:" << stats.encodedFrameWidth
-		<< " h:" << stats.encodedFrameHeight << " encodedFrameCount:" << stats.encodedFrameCount
-		<< " codecType:" << stats.codecType 
-		<< std::endl;
+	if (true == g_Logon)
+	{
+		std::cout << "agora LocalVideoStats sentBitrate:" << stats.sentBitrate << " sent fps:" << stats.sentFrameRate << " enc fps:" << stats.encoderOutputFrameRate
+			<< " rendererOutputFrameRate:" << stats.rendererOutputFrameRate << " targetBitrate:" << stats.targetBitrate
+			<< " targetFrameRate:" << stats.targetFrameRate
+			<< " encodedBitrate:" << stats.encodedBitrate << " w:" << stats.encodedFrameWidth
+			<< " h:" << stats.encodedFrameHeight << " encodedFrameCount:" << stats.encodedFrameCount
+			<< " codecType:" << stats.codecType
+			<< std::endl;
+	}
 
 	if (m_hMainWnd == NULL)
 		return;
@@ -637,12 +640,16 @@ Parameters
 */
 void CAGEngineEventHandler::onRemoteVideoStats(const RemoteVideoStats& stats)
 {
-	std::cout << "agora RemoteVideoStats uid:" << stats.uid << " width:" << stats.width << " height:" << stats.height
-		<< " receivedBitrate:" << stats.receivedBitrate << " decoderOutputFrameRate:" << stats.decoderOutputFrameRate
-		<< " rendererOutputFrameRate:" << stats.rendererOutputFrameRate << " packetLossRate:" << stats.packetLossRate
-		<< " rxStreamType:" << stats.rxStreamType << " totalFrozenTime:" << stats.totalFrozenTime
-		<< " frozenRate:" << stats.frozenRate 
-		<< std::endl;
+	if (true == g_Logon)
+	{
+		std::cout << "agora RemoteVideoStats uid:" << stats.uid << " width:" << stats.width << " height:" << stats.height
+			<< " receivedBitrate:" << stats.receivedBitrate << " decoderOutputFrameRate:" << stats.decoderOutputFrameRate
+			<< " rendererOutputFrameRate:" << stats.rendererOutputFrameRate << " packetLossRate:" << stats.packetLossRate
+			<< " rxStreamType:" << stats.rxStreamType << " totalFrozenTime:" << stats.totalFrozenTime
+			<< " frozenRate:" << stats.frozenRate
+			<< std::endl;
+	}
+	
 	if (m_hMainWnd == NULL)
 		return;
 
@@ -662,20 +669,28 @@ void CAGEngineEventHandler::onRemoteVideoStats(const RemoteVideoStats& stats)
 
 void CAGEngineEventHandler::onLocalAudioStats(const LocalAudioStats& stats)
 {
-    std::cout << "agora onLocalAudioStats numChannels:" << stats.numChannels << " sentSampleRate:" << stats.sentSampleRate 
-        << " sentBitrate:" << stats.sentBitrate << " txPacketLossRate:" 
-		<< std::endl;
+	if (true == g_Logon)
+	{
+		std::cout << "agora onLocalAudioStats numChannels:" << stats.numChannels << " sentSampleRate:" << stats.sentSampleRate
+			<< " sentBitrate:" << stats.sentBitrate << " txPacketLossRate:"
+			<< std::endl;
+	}
+    
 }
 
 void CAGEngineEventHandler::onRemoteAudioStats(const RemoteAudioStats& stats)
 {
-    std::cout << "agora onRemoteAudioStats uid:" << stats.uid << " quality:" << stats.quality 
-        << " networkTransportDelay:" << stats.networkTransportDelay << " jitterBufferDelay:" << stats.jitterBufferDelay
-        << " audioLossRate:" << stats.audioLossRate << " numChannels:" << stats.numChannels  
-        << " receivedSampleRate:" << stats.receivedSampleRate << " receivedBitrate:" << stats.receivedBitrate
-        << " totalFrozenTime:" << stats.totalFrozenTime << " frozenRate:" << stats.frozenRate  
-        << " totalActiveTime:" 
-		<< std::endl;
+	if (true == g_Logon)
+	{
+		std::cout << "agora onRemoteAudioStats uid:" << stats.uid << " quality:" << stats.quality
+			<< " networkTransportDelay:" << stats.networkTransportDelay << " jitterBufferDelay:" << stats.jitterBufferDelay
+			<< " audioLossRate:" << stats.audioLossRate << " numChannels:" << stats.numChannels
+			<< " receivedSampleRate:" << stats.receivedSampleRate << " receivedBitrate:" << stats.receivedBitrate
+			<< " totalFrozenTime:" << stats.totalFrozenTime << " frozenRate:" << stats.frozenRate
+			<< " totalActiveTime:"
+			<< std::endl;
+	}
+    
 }
 
 /**

@@ -8,10 +8,15 @@ import numpy as np
 import threading, queue
 
 
-#app_id = "aab8b8f5a8cd4469a63042fcfafe7063"
-app_id = "b0630af62ce84025bb358c8b62fa7a4e"
-channel_name = "fantest12345"
-profile = {"bitrate": "1000", "fps": "15", "resolution": "640*480"}
+
+app_id = "aab8b8f5a8cd4469a63042fcfafe7063"
+#app_id = "b0630af62ce84025bb358c8b62fa7a4e"
+channel_name = "test"
+
+v_w = 640
+v_h = 480
+profile = {"bitrate": "1000", "fps": "15", "resolution": str(v_w)+"*"+str(v_h)}
+#profile = {"bitrate": "6000", "fps": "60", "resolution": "1920*1080"}
 uid = random.randint(0,1000)
 
 isRobot = False
@@ -19,15 +24,35 @@ isRobot = False
 disableVideo = False
 disableAudio = False
 disable3A = False
+disableFec = False
+
+baselineVideo = False
+
+audioSpecifyCodec = None
+#audioSpecifyCodec = "OPUSFB"
+robot_audio_samplrate = 32000
+robot_audio_chans = 1
 
 enableCustomCapture = False
-customVideoSrc = "C:\\Users\\FJS\\Videos\\wudao.mp4"
+customVideoSrc = ".\\data\\wudao.mp4"
+customAudioSrc = ".\\data\\wudao-2-48.wav"
+
+dllpath = "agoradl/bin"
+
+
+loopback = False
+current_dir = os.path.abspath(os.path.dirname(__file__))
+customVideoSrc = os.path.join(current_dir, customVideoSrc)
+customAudioSrc = os.path.join(current_dir, customAudioSrc)
 
 if isRobot == True:
     enableCustomCapture = True
 
 if enableCustomCapture == True:
-    import cv2  
+    import cv2
+    import wave
+    import audioop
+
 
 
 def customVCapture(queue, agora):
@@ -50,24 +75,72 @@ def customVCapture(queue, agora):
             frame_counter = 0 #Or whatever as long as it is the same as next line
             cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-        h = frame.shape[0]
-        w = frame.shape[1]
+        frame = cv2.resize(frame, (v_w, v_h))
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2YUV_I420)  
         #cv2.imshow("test", frame)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2YUV_I420)
         #frame = frame.astype(np.uint8)
         data_p = frame.ctypes.data_as(ctypes.c_char_p)
-        agora.pushVideoFrame(data_p, w, h)
+        agora.pushVideoFrame(data_p, v_w, v_h)
         
         if cv2.waitKey(delay):
     	    pass
 
-vcapTask = None
+def customACapture(queue, agora):
+    wf = wave.open(customAudioSrc, 'rb')
+    CHUNK = 1024
+    state = None
+    while True:
+        if queue.empty() == False:
+                cmd = queue.get()
+                if cmd == 'done':
+                    break
+        data = wf.readframes(CHUNK)
+        width = 2
+        inchannels = 2
+        insamplerate = 48000
+        converted, state = audioop.ratecv(data, width, inchannels, insamplerate, robot_audio_samplrate, state)
+        if robot_audio_chans == 1:
+            converted = audioop.tomono(converted, 2, 1, 0)
+        if len(converted) > 0:
+            agora.pushAudioFrame(ctypes.c_char_p(converted), ctypes.c_ulong(len(converted)))
+        else:
+            wf.rewind()
+      
+'''
+def customACapture(queue, agora):
+        frequency = 16000  # Our played note will be 440 Hz
+        fs = 44100  # 44100 samples per second
+        seconds = 3  # Note duration of 3 seconds
+
+        # Generate array with seconds*sample_rate steps, ranging between 0 and seconds
+        t = np.linspace(0, seconds, seconds * fs, False)
+
+        # Generate a 440 Hz sine wave
+        note = np.sin(frequency * t * 2 * np.pi)
+
+        # Ensure that highest value is in 16-bit range
+        audio = note * (2**15 - 1) / np.max(np.abs(note))
+        # Convert to 16-bit data
+        audio = audio.astype(np.int16)
+        #agora.pushAudioFrame(audio.ctypes.data_as(ctypes.c_char_p), ctypes.c_ulong(len(audio)))
+        # Start playback
+        import simpleaudio as sa
+        play_obj = sa.play_buffer(audio, 1, 2, fs)
+
+        # Wait for playback to finish before exiting
+        play_obj.wait_done()
+'''          
+vCapTask = None
 vQueue = None
+
+aCapTask = None
+aQueue = None
+
 
 if __name__ ==  '__main__':
     try:
         current_dir = os.path.abspath(os.path.dirname(__file__))
-        current_dir = os.path.join(current_dir,"agoradl/bin")
+        current_dir = os.path.join(current_dir, dllpath)
         os.chdir(current_dir)
         print(current_dir)
         if sys.version_info[0] >= 3 and sys.version_info[1] >= 8:
@@ -91,7 +164,7 @@ if __name__ ==  '__main__':
             agora.addView(ctypes.c_ulonglong(frame_id))
 
         agora.createEngine(ctypes.c_char_p(bytes(app_id, 'utf-8')))
-    
+
         enableAudio = json.dumps({"enable": "true"})
         if disableAudio == True:
             enableAudio = json.dumps({"enable": "false"})
@@ -102,13 +175,28 @@ if __name__ ==  '__main__':
             enableVideo = json.dumps({"enable": "false"})
         agora.enableVideo(ctypes.c_char_p(bytes(enableVideo, 'utf-8')))
 
+        if baselineVideo == True:
+            #100:high， 66:baseline
+            parameter = '{"che.video.h264Profile" : 66}'
+            agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
+
+        #agora.setAudioProfile(profile, scenario)
+       
+        if isRobot == True:
+            agora.logOff()
+            agora.muteAllRemoteVideoStreams()
+            agora.muteAllRemoteAudioStreams()
+            #agora.stopPreview()
         if enableCustomCapture == True:
-            agora.setExternalVideoSource()
-        
+            agora.enableVideoCustomCap()
+            #wf = wave.open(customAudioSrc, 'rb')
+            #agora.enableAudioCustomCap(ctypes.c_int32(wf.getframerate()), ctypes.c_int32(wf.getnchannels()))
+            agora.enableAudioCustomCap(ctypes.c_int32(robot_audio_samplrate), ctypes.c_int32(robot_audio_chans))
+            
         #agora.enumerateRecordingDevices()
         #agora.enumerateVideoDevices()
 
-        #agora.setRecordingDevice(ctypes.c_char_p(bytes("", 'utf-8')))
+        #agora.setRecordingDevice(ctypes.c_char_p(bytes("{0.0.1.00000000}.{5c5eacc2-a2df-47db-9e25-5e6da81b5ae8}", 'utf-8')))
         #agora.setVideoDevice(ctypes.c_char_p(bytes("YY开播", 'utf-8')))
 
         channelProfile = json.dumps({"channelprofile": "1"})
@@ -124,16 +212,29 @@ if __name__ ==  '__main__':
             parameter = '{"che.audio.bypass.apm" : true}'
             agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
 
+        if disableFec == True:
+            parameter = '{"che.video.fecMethod", 0}'
+            agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
+
+            parameter = '{"che.audio.uplink.fec",false}'
+            agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
+
+        if audioSpecifyCodec is not None:    
+            parameter = json.dumps({"che.audio.specify.codec": audioSpecifyCodec})
+            agora.setParameters(ctypes.c_char_p(bytes(parameter, 'utf-8')))
+
         channel = json.dumps({"channelId":channel_name,"uid":str(uid)})
         agora.joinChannel(ctypes.c_char_p(bytes(channel, 'utf-8')))
 
         if enableCustomCapture == True:
             try:
                 vQueue = queue.Queue()
-                #customVCapture(vQueue, agora)
-                vcapTask = threading.Thread(target=customVCapture, args=(vQueue, agora))
-                vcapTask.start()  
-                
+                vCapTask = threading.Thread(target=customVCapture, args=(vQueue, agora))
+                vCapTask.start()  
+
+                aQueue = queue.Queue()
+                aCapTask = threading.Thread(target=customACapture, args=(aQueue, agora))
+                aCapTask.start()
             except Exception as e:
                 print(e)
         window.mainloop()
@@ -141,8 +242,11 @@ if __name__ ==  '__main__':
     except Exception as e:
         print(e)
     finally:
-        if vcapTask is not None:
+        if vCapTask is not None:
             vQueue.put("done")
-            vcapTask.join()
+            vCapTask.join()
+        if aCapTask is not None:
+            aQueue.put("done")
+            aCapTask.join()
         agora.leaveChannel()
         agora.destroyEngine()

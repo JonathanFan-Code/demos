@@ -247,9 +247,8 @@ extern "C" void AGORADL_API setVideoDevice(LPVOID lpExtInfo)
 	}
 }
 
-extern "C" void AGORADL_API setExternalVideoSource()
+extern "C" void AGORADL_API  enableVideoCustomCap()
 {
-    
     agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
     mediaEngine.queryInterface(CAgoraObject::GetAgoraObject(nullptr)->GetEngine(), agora::rtc::AGORA_IID_MEDIA_ENGINE);
     /*
@@ -264,6 +263,51 @@ extern "C" void AGORADL_API setExternalVideoSource()
 extern "C" void AGORADL_API pushVideoFrame(char *buff, int w, int h)
 {
     CAgVideoBuffer::GetInstance()->writeBuffer((BYTE*)buff, w, h);
+}
+
+
+extern "C" void AGORADL_API  enableAudioCustomCap(int nSampleRate, int nChannels)
+{
+	agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
+	mediaEngine.queryInterface(CAgoraObject::GetAgoraObject(nullptr)->GetEngine(), agora::rtc::AGORA_IID_MEDIA_ENGINE);
+
+	agora::base::AParameter apm(CAgoraObject::GetAgoraObject(nullptr)->GetEngine());
+//	rep.setExternalAudioSource(true, nSampleRate, nChannels);
+
+	CircleBuffer::GetInstance()->setAudioInfo(nSampleRate, nChannels);
+	mediaEngine->registerAudioFrameObserver(&CAgoraObject::m_CExtendAudioFrameObserver);
+}
+
+extern "C" void AGORADL_API pushAudioFrame(char *buff, int size)
+{
+	CircleBuffer::GetInstance()->writeBuffer(buff, size);
+}
+
+extern "C" void AGORADL_API muteAllRemoteVideoStreams()
+{
+	CAgoraObject::GetAgoraObject(nullptr)->GetEngine()->muteAllRemoteVideoStreams(true);
+}
+
+extern "C" void AGORADL_API muteAllRemoteAudioStreams()
+{
+	CAgoraObject::GetAgoraObject(nullptr)->GetEngine()->muteAllRemoteAudioStreams(true);
+}
+
+//在有高音质需求的场景（例如音乐教学场景）中，建议将 profile 设置为 AUDIO_PROFILE_MUSIC_HIGH_QUALITY (4)
+//，scenario 设置为 AUDIO_SCENARIO_GAME_STREAMING (3)。
+extern "C" void AGORADL_API setAudioProfile(int profile, int scenario)
+{
+	CAgoraObject::GetAgoraObject(nullptr)->GetEngine()->setAudioProfile((AUDIO_PROFILE_TYPE)profile, (AUDIO_SCENARIO_TYPE)scenario);
+}
+
+extern "C" void AGORADL_API stopPreview()
+{
+	CAgoraObject::GetAgoraObject(nullptr)->GetEngine()->stopPreview();
+}
+
+extern "C" void AGORADL_API logOff()
+{
+	g_Logon = false;
 }
 
 
