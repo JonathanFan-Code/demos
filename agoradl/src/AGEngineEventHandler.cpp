@@ -616,7 +616,7 @@ void CAGEngineEventHandler::onLocalVideoStats(const LocalVideoStats& stats)
 			<< " encodedBitrate:" << stats.encodedBitrate << " w:" << stats.encodedFrameWidth
 			<< " h:" << stats.encodedFrameHeight << " encodedFrameCount:" << stats.encodedFrameCount
 			<< " codecType:" << stats.codecType << " txPacketLossRate:" << stats.txPacketLossRate
-			<< " cap fps:" << stats.captureFrameRate << " videoQualityPoint:" << stats.videoQualityPoint
+			<< " cap fps:" << stats.captureFrameRate 
 			<< std::endl;
 	}
 

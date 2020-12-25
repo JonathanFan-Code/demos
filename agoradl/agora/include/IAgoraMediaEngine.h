@@ -1,14 +1,6 @@
 #ifndef AGORA_MEDIA_ENGINE_H
 #define AGORA_MEDIA_ENGINE_H
-#if defined _WIN32 || defined __CYGWIN__
-typedef unsigned __int8 uint8_t;
-typedef __int64 int64_t;
-typedef unsigned __int64 uint64_t;
-typedef __int32 int32_t;
-typedef unsigned __int32 uint32_t;
-#else
 #include <stdint.h>
-#endif
 
 namespace agora {
 namespace media {
@@ -23,44 +15,51 @@ enum MEDIA_SOURCE_TYPE {
   AUDIO_RECORDING_SOURCE = 1,
 };
 
+/**
+ * The IAudioFrameObserver class.
+ */
 class IAudioFrameObserver {
  public:
+  /** The frame type. */
   enum AUDIO_FRAME_TYPE {
+    /** 0: PCM16. */
     FRAME_TYPE_PCM16 = 0,  // PCM 16bit little endian
   };
   /** Definition of AudioFrame */
   struct AudioFrame {
-    AUDIO_FRAME_TYPE type;
-    /** Number of samples in the audio frame: samples = (int)samplesPerCall = (int)(sampleRate &times; sampleInterval)
+    /** The type of the audio frame. See #AUDIO_FRAME_TYPE
      */
-    int samples;  //number of samples in this frame
-    /** Number of bytes per audio sample. For example, each PCM audio sample usually takes up 16 bits (2 bytes).
+    AUDIO_FRAME_TYPE type;
+    /** The number of samples per channel in the audio frame.
+    */
+    int samples;  //number of samples for each channel in this frame
+    /**The number of bytes per audio sample, which is usually 16-bit (2-byte).
      */
     int bytesPerSample;  //number of bytes per sample: 2 for PCM16
-    /** Number of audio channels.
+    /** The number of audio channels.
      - 1: Mono
      - 2: Stereo (the data is interleaved)
      */
     int channels;  //number of channels (data are interleaved if stereo)
-    /** Audio frame sample rate: 8000, 16000, 32000, 44100, or 48000 Hz.
-     * samplesPerCall = (int)(samplesPerSec &times; sampleInterval &times; numChannels), where sampleInterval &ge; 0.01 in seconds.
+    /** The sample rate.
      */
     int samplesPerSec;  //sampling rate
-    /** Audio frame data buffer. The valid data length is: samples &times; channels &times; bytesPerSample
+    /** The data buffer of the audio frame. When the audio frame uses a stereo channel, the data buffer is interleaved.
+     The size of the data buffer is as follows: `buffer` = `samples` × `channels` × `bytesPerSample`.
      */
     void* buffer;  //data buffer
-      /** The timestamp of the external audio frame. It is mandatory. You can use this parameter for the following purposes:
+      /** The timestamp (ms) of the external audio frame. You can use this parameter for the following purposes:
        - Restore the order of the captured audio frame.
-       - Synchronize audio and video frames in video-related scenarios, including scenarios where external video sources are used.
+       - Synchronize audio and video frames in video-related scenarios, including where external video sources are used.
        */
     int64_t renderTimeMs;
+    /** Reserved parameter.
+    */
     int avsync_type;
   };
 
  public:
   /** Retrieves the recorded audio frame.
-
-  The SDK triggers this callback once every 10 ms.
 
    @param audioFrame Pointer to AudioFrame.
    @return
@@ -68,7 +67,7 @@ class IAudioFrameObserver {
    - false: Invalid buffer in AudioFrame, and the recorded audio frame is discarded.
    */
   virtual bool onRecordAudioFrame(AudioFrame& audioFrame) = 0;
-  /** Retrieves the audio playback frame every 10 ms for getting the audio.
+  /** Retrieves the audio playback frame for getting the audio.
 
    @param audioFrame Pointer to AudioFrame.
    @return
@@ -78,7 +77,6 @@ class IAudioFrameObserver {
   virtual bool onPlaybackAudioFrame(AudioFrame& audioFrame) = 0;
   /** Retrieves the mixed recorded and playback audio frame.
 
-  The SDK triggers this callback once every 10 ms.
 
    @note This callback only returns the single-channel data.
 
@@ -90,7 +88,7 @@ class IAudioFrameObserver {
   virtual bool onMixedAudioFrame(AudioFrame& audioFrame) = 0;
   /** Retrieves the audio frame of a specified user before mixing.
 
-  The SDK triggers this callback once every 10 ms.
+  The SDK triggers this callback if isMultipleChannelFrameWanted returns false.
 
   @param uid The user ID
   @param audioFrame Pointer to AudioFrame.
@@ -100,16 +98,17 @@ class IAudioFrameObserver {
   */
   virtual bool onPlaybackAudioFrameBeforeMixing(unsigned int uid,
       AudioFrame& audioFrame) = 0;
-  
   /** Determines whether to receive audio data from multiple channels.
-   
+
+   @since v3.0.1
+
    After you register the audio frame observer, the SDK triggers this callback every time it captures an audio frame.
 
    In the multi-channel scenario, if you want to get audio data from multiple channels,
    set the return value of this callback as true. After that, the SDK triggers the
    \ref IAudioFrameObserver::onPlaybackAudioFrameBeforeMixingEx "onPlaybackAudioFrameBeforeMixingEx" callback to send you the before-mixing
    audio data from various channels. You can also get the channel ID of each audio frame.
-   
+
    @note
    - Once you set the return value of this callback as true, the SDK triggers
    only the \ref IAudioFrameObserver::onPlaybackAudioFrameBeforeMixingEx "onPlaybackAudioFrameBeforeMixingEx" callback
@@ -121,11 +120,11 @@ class IAudioFrameObserver {
    - `false`: Do not receive audio data from multiple channels.
    */
   virtual bool isMultipleChannelFrameWanted() { return false; }
-  
+
   /** Gets the before-mixing playback audio frame from multiple channels.
 
   After you successfully register the audio frame observer, if you set the return
-  value of isMultipleChannelFrameWanted as true, the SDK triggers this callback each
+  value of \ref IAudioFrameObserver::isMultipleChannelFrameWanted "isMultipleChannelFrameWanted" as true, the SDK triggers this callback each
   time it receives a before-mixing audio frame from any of the channel.
 
   @param channelId The channel ID of this audio frame.
@@ -137,17 +136,44 @@ class IAudioFrameObserver {
   */
   virtual bool onPlaybackAudioFrameBeforeMixingEx(const char *channelId,
       unsigned int uid, AudioFrame& audioFrame) { return true; }
+
 };
 
+/**
+ * The IVideoFrameObserver class.
+ */
 class IVideoFrameObserver {
  public:
+ /** The video frame type. */
   enum VIDEO_FRAME_TYPE {
+    /**
+     * 0: YUV420
+     */
     FRAME_TYPE_YUV420 = 0,  // YUV 420 format
+    /**
+     * 1: YUV422
+     */
+    FRAME_TYPE_YUV422 = 1,  // YUV 422 format
+    /**
+     * 2: RGBA
+     */
     FRAME_TYPE_RGBA = 2,    // RGBA format
   };
+  /**
+   * The frame position of the video observer.
+   */
   enum VIDEO_OBSERVER_POSITION {
+    /**
+     * 1: The post-capturer position, which corresponds to the video data in the onCaptureVideoFrame callback.
+     */
     POSITION_POST_CAPTURER = 1 << 0,
+    /**
+     * 2: The pre-renderer position, which corresponds to the video data in the onRenderVideoFrame callback.
+     */
     POSITION_PRE_RENDERER = 1 << 1,
+    /**
+     * 4: The pre-encoder position, which corresponds to the video data in the onPreEncodeVideoFrame callback.
+     */
     POSITION_PRE_ENCODER = 1 << 2,
   };
   /** Video frame information. The video data format is YUV420. The buffer provides a pointer to a pointer. The interface cannot modify the pointer of the buffer, but can modify the content of the buffer only.
@@ -181,7 +207,7 @@ class IVideoFrameObserver {
     /** Set the rotation of this frame before rendering the video. Supports 0, 90, 180, 270 degrees clockwise.
      */
     int rotation; // rotation of this frame (0, 90, 180, 270)
-      /** The timestamp of the external audio frame. It is mandatory. You can use this parameter for the following purposes:
+      /** The timestamp (ms) of the external audio frame. It is mandatory. You can use this parameter for the following purposes:
        - Restore the order of the captured audio frame.
        - Synchronize audio and video frames in video-related scenarios, including scenarios where external video sources are used.
      @note This timestamp is for rendering the video stream, and not for capturing the video stream.
@@ -191,49 +217,135 @@ class IVideoFrameObserver {
   };
 
  public:
-  /** Retrieves the camera captured image.
-
-   @param videoFrame VideoFrame
+  /** Occurs each time the SDK receives a video frame captured by the local camera.
+   *
+   * After you successfully register the video frame observer, the SDK triggers this callback each time a video frame is received. In this callback,
+   * you can get the video data captured by the local camera. You can then pre-process the data according to your scenarios.
+   *
+   * After pre-processing, you can send the processed video data back to the SDK by setting the `videoFrame` parameter in this callback.
+   *
+   * @note
+   * - This callback does not support sending processed RGBA video data back to the SDK.
+   * - The video data that this callback gets has not been pre-processed, without the watermark, the cropped content, the rotation, and the image enhancement.
+   *
+   * @param videoFrame Pointer to VideoFrame.
+   * @return Whether or not to ignore the current video frame if the pre-processing fails:
+   * - true: Do not ignore.
+   * - false: Ignore the current video frame, and do not send it back to the SDK.
    */
   virtual bool onCaptureVideoFrame(VideoFrame& videoFrame) = 0;
-  /** Retrieves the video data to be encoded.
-
-   @param videoFrame VideoFrame
+  /** @since v3.0.0
+   *
+   * Occurs each time the SDK receives a video frame before encoding.
+   *
+   * After you successfully register the video frame observer, the SDK triggers this callback each time when it receives a video frame. In this callback, you can get the video data before encoding. You can then process the data according to your particular scenarios.
+   *
+   * After processing, you can send the processed video data back to the SDK by setting the `VideoFrame` parameter in this callback.
+   *
+   * @note
+   * - As of v3.0.1, if you want to receive this callback, you also need to set `POSITION_PRE_ENCODE(1 << 2)` as a frame position in the \ref getObservedFramePosition "getObservedFramePosition" callback.
+   * - The video data that this callback gets has been pre-processed, with its content cropped, rotated, and the image enhanced.
+   * - This callback does not support sending processed RGBA video data back to the SDK.
+   *
+   * @param videoFrame A pointer to VideoFrame
+   * @return Whether to ignore the current video frame if the processing fails:
+   * - true: Do not ignore the current video frame.
+   * - false: Ignore the current video frame, and do not send it back to the SDK.
    */
   virtual bool onPreEncodeVideoFrame(VideoFrame& videoFrame) { return true; }
-  /** Processes the received image of the specified user (post-processing).
-
-   @param uid User ID of the specified user sending the image.
-   @param videoFrame VideoFrame
+  /** Occurs each time the SDK receives a video frame sent by the remote user.
+   *
+   * After you successfully register the video frame observer and isMultipleChannelFrameWanted return false, the SDK triggers this callback each time a video frame is received.
+   * In this callback, you can get the video data sent by the remote user. You can then post-process the data according to your scenarios.
+   *
+   * After post-processing, you can send the processed data back to the SDK by setting the `videoFrame` parameter in this callback.
+   *
+   * @note
+   * This callback does not support sending processed RGBA video data back to the SDK.
+   *
+   * @param uid ID of the remote user who sends the current video frame.
+   * @param videoFrame Pointer to VideoFrame.
+   * @return Whether or not to ignore the current video frame if the post-processing fails:
+   * - true: Do not ignore.
+   * - false: Ignore the current video frame, and do not send it back to the SDK.
    */
   virtual bool onRenderVideoFrame(unsigned int uid, VideoFrame& videoFrame) = 0;
-  /** Occurs each time the SDK receives a video frame and prompts you whether or not to rotate the captured video according to the rotation member in the VideoFrame class. 
+  /** Occurs each time the SDK receives a video frame and prompts you to set the video format.
+   *
+   * YUV420 is the default video format. If you want to receive other video formats, register this callback in the IVideoFrameObserver class.
+   *
+   * After you successfully register the video frame observer, the SDK triggers this callback each time it receives a video frame.
+   * You need to set your preferred video data in the return value of this callback.
+   *
+   * @return Sets the video format: #VIDEO_FRAME_TYPE
+   * - #FRAME_TYPE_YUV420 (0): (Default) YUV420.
+   * - #FRAME_TYPE_RGBA (2): RGBA
+   */
+  virtual VIDEO_FRAME_TYPE getVideoFormatPreference() { return FRAME_TYPE_YUV420; }
+  /** Occurs each time the SDK receives a video frame and prompts you whether or not to rotate the captured video according to the rotation member in the VideoFrame class.
    *
    * The SDK does not rotate the captured video by default. If you want to rotate the captured video according to the rotation member in the VideoFrame class, register this callback in the IVideoFrameObserver class.
    *
    * After you successfully register the video frame observer, the SDK triggers this callback each time it receives a video frame. You need to set whether or not to rotate the video frame in the return value of this callback.
+   *
+   * @note
+   * This callback applies to RGBA video data only.
    *
    * @return Sets whether or not to rotate the captured video:
    * - true: Rotate.
    * - false: （Default) Do not rotate.
    */
   virtual bool getRotationApplied() { return false; }
-  /** Prompts the SDK which position you want to observe. 
+  /** Occurs each time the SDK receives a video frame and prompts you whether or not to mirror the captured video.
    *
-   * The SDK provides 3 positions for observer. Each position corresponds to a callback function:
-   * - POSITION_POST_CAPTURER: onCaptureVideoFrame
-   * - POSITION_PRE_RENDERER: onRenderVideoFrame
-   * - POSITION_PRE_ENCODER: onPreEncodeVideoFrame
+   * The SDK does not mirror the captured video by default. Register this callback in the IVideoFrameObserver class if you want to mirror the captured video.
    *
-   * You can observe more than one position by using '|' operator.
-   * 
-   * After you successfully register the video frame observer, the SDK triggers this callback each time it receives a video frame. You have to set which position you need to observe.
+   * After you successfully register the video frame observer, the SDK triggers this callback each time a video frame is received.
+   * You need to set whether or not to mirror the captured video in the return value of this callback.
    *
-   * @return Bit code of video frame positions to be observed.
-   * 
+   * @note
+   * This callback applies to RGBA video data only.
+   *
+   * @return Sets whether or not to mirror the captured video:
+   * - true: Mirror.
+   * - false: (Default) Do not mirror.
    */
-  virtual uint32_t getObservedFramePosition() { return POSITION_POST_CAPTURER | POSITION_PRE_RENDERER; }
-  
+  virtual bool getMirrorApplied() { return false; }
+  /** @since v3.0.0
+
+   Sets whether to output the acquired video frame smoothly.
+
+   If you want the video frames acquired from \ref IVideoFrameObserver::onRenderVideoFrame "onRenderVideoFrame" to be more evenly spaced, you can register the `getSmoothRenderingEnabled` callback in the `IVideoFrameObserver` class and set its return value as `true`.
+
+   @note
+   - Register this callback before joining a channel.
+   - This callback applies to scenarios where the acquired video frame is self-rendered after being processed, not to scenarios where the video frame is sent back to the SDK after being processed.
+
+   @return Set whether or not to smooth the video frames:
+   - true: Smooth the video frame.
+   - false: (Default) Do not smooth.
+   */
+  virtual bool getSmoothRenderingEnabled(){ return false; }
+  /**
+   * Sets the frame position for the video observer.
+   * @since v3.0.1
+   *
+   * After you successfully register the video observer, the SDK triggers this callback each time it receives a video frame. You can determine which position to observe by setting the return value.
+   * The SDK provides 3 positions for observer. Each position corresponds to a callback function:
+   * - `POSITION_POST_CAPTURER(1 << 0)`: The position after capturing the video data, which corresponds to the \ref onCaptureVideoFrame "onCaptureVideoFrame" callback.
+   * - `POSITION_PRE_RENDERER(1 << 1)`: The position before receiving the remote video data, which corresponds to the \ref onRenderVideoFrame "onRenderVideoFrame" callback.
+   * - `POSITION_PRE_ENCODER(1 << 2)`: The position before encoding the video data, which corresponds to the \ref onPreEncodeVideoFrame "onPreEncodeVideoFrame" callback.
+   *
+   * @note
+   * - Use '|' (the OR operator) to observe multiple frame positions.
+   * - This callback observes `POSITION_POST_CAPTURER(1 << 0)` and `POSITION_PRE_RENDERER(1 << 1)` by default.
+   * - To conserve the system consumption, you can reduce the number of frame positions that you want to observe.
+   *
+   * @return A bit mask that controls the frame position of the video observer: #VIDEO_OBSERVER_POSITION.
+   *
+   */
+  virtual uint32_t getObservedFramePosition() { return static_cast<uint32_t>(POSITION_POST_CAPTURER | POSITION_PRE_RENDERER); }
+
   /** Determines whether to receive video data from multiple channels.
 
    After you register the video frame observer, the SDK triggers this callback
@@ -241,12 +353,12 @@ class IVideoFrameObserver {
 
    In the multi-channel scenario, if you want to get video data from multiple channels,
    set the return value of this callback as true. After that, the SDK triggers the
-   onRenderVideoFrameEx callback to send you
+   \ref IVideoFrameObserver::onRenderVideoFrameEx "onRenderVideoFrameEx" callback to send you
    the video data from various channels. You can also get the channel ID of each video frame.
 
    @note
    - Once you set the return value of this callback as true, the SDK triggers only the `onRenderVideoFrameEx` callback to
-   send the video frame. onRenderVideoFrame will not be triggered. In the multi-channel scenario, Agora recommends setting the return value as true.
+   send the video frame. \ref IVideoFrameObserver::onRenderVideoFrame "onRenderVideoFrame" will not be triggered. In the multi-channel scenario, Agora recommends setting the return value as true.
    - If you set the return value of this callback as false, the SDK triggers only the `onRenderVideoFrame` callback to send the video data.
    @return
    - `true`: Receive video data from multiple channels.
@@ -255,9 +367,9 @@ class IVideoFrameObserver {
   virtual bool isMultipleChannelFrameWanted() { return false; }
 
   /** Gets the video frame from multiple channels.
-   
+
    After you successfully register the video frame observer, if you set the return value of
-   isMultipleChannelFrameWanted as true, the SDK triggers this callback each time it receives a video frame
+   \ref IVideoFrameObserver::isMultipleChannelFrameWanted "isMultipleChannelFrameWanted" as true, the SDK triggers this callback each time it receives a video frame
    from any of the channel.
 
    You can process the video data retrieved from this callback according to your scenario, and send the
@@ -273,24 +385,16 @@ class IVideoFrameObserver {
    - `false`: Do not send this video frame.
    */
   virtual bool onRenderVideoFrameEx(const char *channelId, unsigned int uid, VideoFrame& videoFrame) { return true; }
-
-  /** Occurs each time the SDK receives a video frame and prompts you to set the video format. 
-   *
-   * YUV420 is the default video format. If you want to receive other video formats, register this callback in the IVideoFrameObserver class.
-   *
-   * After you successfully register the video frame observer, the SDK triggers this callback each time it receives a video frame. 
-   * You need to set your preferred video data in the return value of this callback.
-   *
-   * @return Sets the video format: #VIDEO_FRAME_TYPE
-   * - #FRAME_TYPE_YUV420 (0): (Default) YUV420.
-   * - #FRAME_TYPE_RGBA (2): RGBA
-   */
-  virtual VIDEO_FRAME_TYPE getVideoFormatPreference() { return FRAME_TYPE_YUV420; }
 };
 
 class IVideoFrame {
  public:
-  enum PLANE_TYPE { Y_PLANE = 0, U_PLANE = 1, V_PLANE = 2, NUM_OF_PLANES = 3 };
+  enum PLANE_TYPE {
+    Y_PLANE = 0,
+    U_PLANE = 1,
+    V_PLANE = 2,
+    NUM_OF_PLANES = 3
+  };
   enum VIDEO_TYPE {
     VIDEO_TYPE_UNKNOWN = 0,
     VIDEO_TYPE_I420 = 1,
@@ -309,6 +413,7 @@ class IVideoFrame {
     VIDEO_TYPE_NV12 = 14,
     VIDEO_TYPE_BGRA = 15,
     VIDEO_TYPE_RGBA = 16,
+    VIDEO_TYPE_I422 = 17,
   };
   virtual void release() = 0;
   virtual const unsigned char* buffer(PLANE_TYPE type) const = 0;
@@ -352,7 +457,7 @@ class IVideoFrame {
   /** Retrieves the height of the frame.
    */
   virtual int height() const = 0;
-  /** Retrieves the timestamp (90 ms) of the frame.
+  /** Retrieves the timestamp (ms) of the frame.
    */
   virtual unsigned int timestamp() const = 0;
   /** Retrieves the render time (ms).
@@ -365,6 +470,8 @@ class IVideoFrame {
    - false: The plane is not of zero size.
    */
   virtual bool IsZeroSize() const = 0;
+
+  virtual VIDEO_TYPE GetVideoType() const = 0;
 };
 /** **DEPRECATED** */
 class IExternalVideoRenderCallback {
@@ -434,6 +541,8 @@ struct ExternalVideoFrame
     };
 
     /** The video pixel format.
+     *
+     * @note The SDK does not support the alpha channel, and discards any alpha value passed to the SDK.
      */
     enum VIDEO_PIXEL_FORMAT
     {
@@ -446,9 +555,24 @@ struct ExternalVideoFrame
         /** 2: The video pixel format is BGRA.
          */
         VIDEO_PIXEL_BGRA = 2,
+        /** 3: The video pixel format is NV21.
+         */
+        VIDEO_PIXEL_NV21 = 3,
+        /** 4: The video pixel format is RGBA.
+         */
+        VIDEO_PIXEL_RGBA = 4,
+        /** 5: The video pixel format is IMC2.
+         */
+        VIDEO_PIXEL_IMC2 = 5,
+        /** 7: The video pixel format is ARGB.
+         */
+        VIDEO_PIXEL_ARGB = 7,
         /** 8: The video pixel format is NV12.
          */
         VIDEO_PIXEL_NV12 = 8,
+        /** 16: The video pixel format is I422.
+         */
+        VIDEO_PIXEL_I422 = 16,
     };
 
     /** The buffer type. See #VIDEO_BUFFER_TYPE
@@ -481,98 +605,53 @@ struct ExternalVideoFrame
     /** [Raw data related parameter] The clockwise rotation of the video frame. You can set the rotation angle as 0, 90, 180, or 270. The default value is 0.
      */
     int rotation;
-    /** Timestamp of the incoming video frame (ms). An incorrect timestamp results in frame loss or unsynchronized audio and video.
+    /** Timestamp (ms) of the incoming video frame. An incorrect timestamp results in frame loss or unsynchronized audio and video.
      */
     long long timestamp;
-};
 
-enum CODEC_VIDEO_FRAME_TYPE {
-	CODEC_VIDEO_FRAME_TYPE_BLANK_FRAME = 0,
-	CODEC_VIDEO_FRAME_TYPE_KEY_FRAME = 3,
-	CODEC_VIDEO_FRAME_TYPE_DELTA_FRAME = 4,
-	CODEC_VIDEO_FRAME_TYPE_B_FRAME = 5,
-	CODEC_VIDEO_FRAME_TYPE_UNKNOW
-};
-
-enum VIDEO_ORIENTATION {
-	VIDEO_ORIENTATION_0 = 0,
-	VIDEO_ORIENTATION_90 = 90,
-	VIDEO_ORIENTATION_180 = 180,
-	VIDEO_ORIENTATION_270 = 270
-};
-
-/** Video codec types */
-enum VIDEO_CODEC_TYPE {
-	/** Standard VP8 */
-	VIDEO_CODEC_VP8 = 1,
-	/** Standard H264 */
-	VIDEO_CODEC_H264 = 2,
-	/** Enhanced VP8 */
-	VIDEO_CODEC_EVP = 3,
-	/** Enhanced H264 */
-	VIDEO_CODEC_E264 = 4,
-};
-
-/** * The struct of EncodedVideoFrameInfo. */
-struct EncodedVideoFrameInfo {
-	EncodedVideoFrameInfo() : codecType(VIDEO_CODEC_H264),
-		width(0),
-		height(0),
-		frameType(CODEC_VIDEO_FRAME_TYPE_BLANK_FRAME),
-		rotation(VIDEO_ORIENTATION_0),
-		renderTimeMs(0) {}
-	/**
-	 * The video codec: #VIDEO_CODEC_TYPE.
-	 */
-	VIDEO_CODEC_TYPE codecType;
-	/**   * The width (px) of the video.   */
-	int width;
-	/**   * The height (px) of the video.   */
-	int height;
-	/**   * The frame type of the encoded video frame: #VIDEO_FRAME_TYPE.   */
-	CODEC_VIDEO_FRAME_TYPE frameType;
-	/**   * The rotation information of the encoded video frame: #VIDEO_ORIENTATION.   */
-	VIDEO_ORIENTATION rotation;
-	/**   * The timestamp for rendering the video.   */
-	int64_t renderTimeMs;
-};
-
-/** * The IVideoEncodedImageReceiver class. */
-class IVideoEncodedImageReceiver {
-public:
-	/**
-	  * Occurs each time the SDK receives an encoded video image.
-	  * @param imageBuffer The pointer to the video image buffer.
-	  * @param length The data length of the video image.
-	  * @param videoEncodedFrameInfo The information of the encoded video frame: EncodedVideoFrameInfo.
-	  *
-	  */
-	virtual bool OnEncodedVideoImageReceived(const uint8_t* imageBuffer, unsigned int length, const EncodedVideoFrameInfo& videoEncodedFrameInfo) = 0;
-
-	virtual ~IVideoEncodedImageReceiver() {};
+    ExternalVideoFrame()
+    :cropLeft(0)
+    ,cropTop(0)
+    ,cropRight(0)
+    ,cropBottom(0)
+    ,rotation(0)
+    {}
 };
 
 class IMediaEngine {
  public:
+  virtual ~IMediaEngine () {};
   virtual void release() = 0;
   /** Registers an audio frame observer object.
 
    This method is used to register an audio frame observer object (register a callback). This method is required to register callbacks when the engine is required to provide an \ref IAudioFrameObserver::onRecordAudioFrame "onRecordAudioFrame" or \ref IAudioFrameObserver::onPlaybackAudioFrame "onPlaybackAudioFrame" callback.
 
-   @param observer Audio frame observer object instance. If NULL is passed in, the registration is canceled.
+   @note Ensure that you call this method before joining a channel.
+
+   @param observer Audio frame observer object instance. See IAudioFrameObserver. Set the value as NULL to release the
+   audio observer object. Agora recommends calling `registerAudioFrameObserver(NULL)` after receiving the \ref agora::rtc::IRtcEngineEventHandler::onLeaveChannel "onLeaveChannel" callback.
+
    @return
    - 0: Success.
    - < 0: Failure.
    */
   virtual int registerAudioFrameObserver(IAudioFrameObserver* observer) = 0;
   /** Registers a video frame observer object.
-
-   This method is required to register callbacks when the engine is required to provide an \ref IVideoFrameObserver::onCaptureVideoFrame "onCaptureVideoFrame" or \ref IVideoFrameObserver::onRenderVideoFrame "onRenderVideoFrame" callback.
-
-   @param observer Video frame observer object instance. If NULL is passed in, the registration is canceled.
-   @return
-   - 0: Success.
-   - < 0: Failure.
+   *
+   * You need to implement the IVideoFrameObserver class in this method, and register callbacks according to your scenarios.
+   *
+   * After you successfully register the video frame observer, the SDK triggers the registered callbacks each time a video frame is received.
+   *
+   * @note
+   * - When handling the video data returned in the callbacks, pay attention to the changes in the `width` and `height` parameters,
+   * which may be adapted under the following circumstances:
+   *  - When the network condition deteriorates, the video resolution decreases incrementally.
+   *  - If the user adjusts the video profile, the resolution of the video returned in the callbacks also changes.
+   * - Ensure that you call this method before joining a channel.
+   * @param observer Video frame observer object instance. If NULL is passed in, the registration is canceled.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
    */
   virtual int registerVideoFrameObserver(IVideoFrameObserver* observer) = 0;
   /** **DEPRECATED** */
@@ -604,42 +683,43 @@ class IMediaEngine {
    */
   virtual int pushAudioFrame(IAudioFrameObserver::AudioFrame* frame) = 0;
   /** Pulls the remote audio data.
-   * 
-   * Before calling this method, call the 
-   * \ref agora::rtc::IRtcEngine::setExternalAudioSink 
-   * "setExternalAudioSink(enabled: true)" method to enable and set the 
+   *
+   * Before calling this method, call the
+   * \ref agora::rtc::IRtcEngine::setExternalAudioSink
+   * "setExternalAudioSink(enabled: true)" method to enable and set the
    * external audio sink.
-   * 
-   * After a successful method call, the app pulls the decoded and mixed 
+   *
+   * After a successful method call, the app pulls the decoded and mixed
    * audio data for playback.
-   * 
+   *
    * @note
-   * - Once you call the \ref agora::rtc::IRtcEngine::pullAudioFrame 
-   * "pullAudioFrame" method successfully, the app will not retrieve any audio 
-   * data from the 
-   * \ref agora::rtc::IRtcEngineEventHandler::onPlaybackAudioFrame 
+   * - Once you call the \ref agora::media::IMediaEngine::pullAudioFrame
+   * "pullAudioFrame" method successfully, the app will not retrieve any audio
+   * data from the
+   * \ref agora::media::IAudioFrameObserver::onPlaybackAudioFrame
    * "onPlaybackAudioFrame" callback.
-   * - The difference between the 
-   * \ref agora::rtc::IRtcEngineEventHandler::onPlaybackAudioFrame 
-   * "onPlaybackAudioFrame" callback and the 
-   * \ref agora::rtc::IRtcEngine::pullAudioFrame "pullAudioFrame" method is as 
+   * - The difference between the
+   * \ref agora::media::IAudioFrameObserver::onPlaybackAudioFrame
+   * "onPlaybackAudioFrame" callback and the
+   * \ref agora::media::IMediaEngine::pullAudioFrame "pullAudioFrame" method is as
    * follows:
-   *  - onPlaybackAudioFrame: The SDK sends the audio data to the app once 
-   * every 10 ms. Any delay in processing the audio frames may result in audio 
-   * jitter.
-   *  - pullAudioFrame: The app pulls the remote audio data. After setting the 
-   * audio data parameters, the SDK adjusts the frame buffer and avoids 
+   *  - `onPlaybackAudioFrame`: The SDK sends the audio data to the app through this callback.
+   * Any delay in processing the audio frames may result in audio jitter.
+   *  - `pullAudioFrame`: The app pulls the remote audio data. After setting the
+   * audio data parameters, the SDK adjusts the frame buffer and avoids
    * problems caused by jitter in the external audio playback.
-   * 
-   * @param frame Pointers to the audio frame. 
+   *
+   * @param frame Pointers to the audio frame.
    * See: \ref IAudioFrameObserver::AudioFrame "AudioFrame".
-   * 
+   *
    * @return
    * - 0: Success.
    * - < 0: Failure.
    */
   virtual int pullAudioFrame(IAudioFrameObserver::AudioFrame* frame) = 0;
     /** Configures the external video source.
+
+    @note Ensure that you call this method before joining a channel.
 
     @param enable Sets whether to use the external video source:
     - true: Use the external video source.
@@ -658,15 +738,13 @@ class IMediaEngine {
 
      @param frame Video frame to be pushed. See \ref ExternalVideoFrame "ExternalVideoFrame".
 
-     @note In the Communication profile, this method does not support video frames in the Texture format.
+     @note In the `COMMUNICATION` profile, this method does not support video frames in the Texture format.
 
      @return
      - 0: Success.
      - < 0: Failure.
      */
     virtual int pushVideoFrame(ExternalVideoFrame *frame) = 0;
-
-	virtual int registerVideoEncodedImageReceiver(IVideoEncodedImageReceiver*receiver) = 0;
 };
 
 }  // namespace media
