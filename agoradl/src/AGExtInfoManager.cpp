@@ -91,6 +91,8 @@ AHANDLE CAGExtInfoManager::GetOneFreeView()
 
 AHANDLE CAGExtInfoManager::GetFirstView()
 {
+    if(m_wnds.empty())
+        return NULL;
 	auto pos = find(m_wndFreeView.begin(), m_wndFreeView.end(), m_wnds[0]);
 	if (pos == m_wndFreeView.end())
 		return m_wnds[0];
