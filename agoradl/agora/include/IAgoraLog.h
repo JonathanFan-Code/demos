@@ -30,6 +30,15 @@ class ILogWriter {
   virtual ~ILogWriter() {}
 };
 
+struct log_cache {
+    int count = 0;
+    int total_count = 0;
+    char buf[500][270];
+    int length[500];
+    int size = 0;
+    log_cache* next = nullptr;
+};
+
 
 } //namespace commons
 } //namespace agora

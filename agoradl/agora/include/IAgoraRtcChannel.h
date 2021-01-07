@@ -186,6 +186,13 @@ public:
         (void)reason;
         (void)elapsed;
     }
+
+    virtual void onVideoBufferingStateChanged(IChannel *rtcChannel, uid_t uid, VIDEO_BUFFERING_STATE state, int64_t timestampInMs) {
+        (void)rtcChannel;
+        (void)uid;
+        (void)state;
+        (void)timestampInMs;
+    }
     
     virtual void onStreamMessage(IChannel *rtcChannel, uid_t uid, int streamId, const char* data, size_t length) {
         (void)rtcChannel;
@@ -284,6 +291,8 @@ public:
                                            const ChannelMediaOptions& options) = 0;
     
     virtual int leaveChannel() = 0;
+
+    virtual int setAVSyncSource(const char *channelId, uid_t uid) = 0;
     
     /** Allows this connection to upload stream. This method will unpublish the current publishing connection if there exists.
      */
